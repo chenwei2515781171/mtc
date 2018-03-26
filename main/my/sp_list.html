@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>媒体视频列表</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+    <style>
+    	.list{clear:both;width:100%;height:40px;text-align:center;background-color: #0a9d28;line-height: 40px;color:#ffffff;font-size:1rem;margin-right:20px;border-radius:2px}
+    	#close1{clear:both;width:100%;height:40px;text-align:center;background-color: #ffffff;line-height: 40px;color:#000000;font-size:1rem;margin-right:20px;border-radius:2px;border:1px solid #e1e1e1}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">媒体视频列表</h1>
+	</header>
+	<div class='media' id="media"></div>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--列表模板-->
+<script type="text/html" id='sp-list'>
+	{{each Result as value i}}
+		<p class="list" id="{{value.device_id}}" >{{value.device_name}}</p>
+	{{/each}}
+	<p  id="close1" >关闭</p>
+</script>
+<script>
+	//获取媒体视频数据
+	mui.plusReady(function(){
+		var li = plus.webview.currentWebview();
+		var media_id = li.media_id;
+		mui.ajax({
+			url:path+'/app/puton/putonsplist',
+			type:'post',
+			dataType:'json',
+			data:{
+				'media_id':media_id,
+			},
+			success:function(data){
+				var media = document.getElementById("media");
+				var content = template("sp-list", data);
+				media.innerHTML = content;
+				document.getElementById('close1').addEventListener('tap',function(){
+				    mui.back();
+				});
+				goto_sp_detail();
+			},
+		});
+	});
+	//遍历节点，添加点击事件
+	function goto_sp_detail(){
+		var list=document.getElementsByClassName('list');
+		var device_id='';
+		for(var i=0;i<list.length;i++){
+			list[i].addEventListener('tap',function(){
+				device_id=this.getAttribute("id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				mui.openWindow({
+					url: "video_img.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						device_id: device_id
+					}
+			    });
+			});
+		}
+	}
+</script>
+</body>
+</html>

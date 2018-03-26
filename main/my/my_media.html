@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>我的媒体</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" />
+</head>
+<style>
+	#media{margin-top:40px}
+	.media_collect{position:relative}
+	.media_collect p{width: 90%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; }
+	#apply{width:80%;height:2.5rem;border-radius:2px;background-color:#0a9d28;margin-left:10%;margin-top:10%;line-height: 2.5rem;font-size:1rem;color:#fff;}
+	.avatar{position:absolute;bottom:2px;right:0px;width:1.2rem;height:1.2rem}
+	.avatar img{width:100%}
+</style>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">我的媒体</h1>
+	</header>
+	<div class='media' id="media"></div>
+	<p id="dj" class="dj jz">点击加载更多数据... </p>
+	<p id="apply" class="dj" >申请安装摄像头</p>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--JS模板-->
+<script type="text/html" id="media-list">
+	{{each Result as value i}}
+		<div class="media_collect" id='{{value.media_id}}' >
+			<img src="{{value.media_img}}" />
+			<p>{{value.media_name}}</p>
+			{{if avatar }}
+				<div class="avatar" >
+					<img src="{{avatar}}" />
+				</div>
+			{{/if}}
+			{{if value.media_url_state==1 }}
+				<img class="live_img" src="../../images/sxt.png" style="height:18px;width:25px;position:absolute;top:0;right:0;z-index:9;">
+			{{/if}}
+		</div>
+	{{/each}}
+</script>
+<script type="text/javascript">
+	mui.init();
+	var user_id=localStorage.getItem('user_id');
+	var avatar=localStorage.getItem('avatar');
+	var pages=1;
+	mui.ajax({
+		url:path+'/app/media/mymedia',
+		type:'post',
+		dataType:'json',
+		data:{
+			'user_id':user_id,
+			"next_pages":pages
+		},
+		success:function(data){
+			var err=data.errmsg;
+			if(!err){
+				pages=data.pages;
+				var media_list = document.getElementById("media");
+				data.avatar=avatar;
+				var content = template("media-list", data);
+				media_list.innerHTML = content;
+				more_data();
+				goto_media_detail();
+			}else{
+				var no_data=document.getElementById('dj');
+				no_data.innerText="暂无数据！";
+				mui.toast(err);
+			};
+		},
+	});
+	//遍历媒体节点，添加点击事件
+	function goto_media_detail(){
+		var list_id=document.getElementsByClassName('media_collect');
+		var media_id='';
+		for(var i=0;i<list_id.length;i++){
+			list_id[i].addEventListener('tap',function(){
+				media_id=this.getAttribute("id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				mui.openWindow({
+					url: "my_media_detail.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						media_id: media_id
+					}
+			    });
+			});
+		}
+	}
+	//点击加载更多数据
+	function more_data(){
+		document.getElementById('dj').addEventListener('tap',function(){
+			var next_pages=parseInt(pages)+1;
+			mui.ajax({
+				url:path+'/app/media/mymedia',
+				type:'post',
+				dataType:'json',
+				data:{
+					"user_id":user_id,
+					"next_pages":next_pages
+				}, 
+				success:function(data){
+					var no_data=document.getElementById('dj');
+					var err=data.errmsg;
+					if(!err){
+							pages=data.pages;
+							var media_list = document.getElementById("media");
+							for(var i=0;i<data.Result.length;i++){
+								var div=document.createElement('div');
+								div.className='media_collect';
+								div.id=data.Result[i]['media_id'];
+								var img=data.Result[i]['media_img'];
+								var name=data.Result[i]['media_name'];
+								var state=data.Result[i]['media_url_state'];
+							    var a='<img src="'+img+'"/><p>'+name+'</p><div style="position:absolute;bottom:2px;right:0px;width:1.2rem;height:1.2rem"><img src="'+avatar+'" style="width:100%"/></div>';
+							    var c='';
+								if(state==1){
+									c='<img class="live_img" src="../../images/sxt.png" style="height:18px;width:25px;position:absolute;top:0;right:0;z-index:9;">';
+								};
+								div.innerHTML=a+c;
+								media_list.appendChild(div);
+							};
+							goto_media_detail();
+					}else{
+						no_data.innerText="已经没有更多数据了！";
+					};
+				},
+			});
+		});
+	};
+	document.getElementById('apply').addEventListener('tap',function(){
+		mui.openWindow({
+			url: "apply_video.html",
+			waiting: {
+				autoShow: false
+			}		
+		});
+	});
+</script>	
+</body>
+</html>

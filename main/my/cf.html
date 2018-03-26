@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>投诉与反馈</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="../../css/cf.css" />
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">投诉与反馈</h1>
+	</header>
+	<div class="content">
+		<textarea name="content" id="content" class="import" ></textarea>
+		<div class="lz">
+			<p class="log" id="qd">发送</p>
+		</div>
+	</div>
+	<div class="log" id="qx"  >
+		<span class="mui-icon mui-icon-spinner mui-spin sx"></span>
+		<!--<p class="sx1">刷新</p>-->
+	</div>
+	<div class="content_list" id="content_list"></div>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/url.js"></script> 
+<script type="text/javascript">
+	mui.init();
+	var user_id=localStorage.getItem('user_id');
+	var user_name=localStorage.getItem('user_name');
+	var avatar=localStorage.getItem('avatar');
+	news_list();
+	//获取聊天记录
+	function news_list(){
+		mui.ajax({
+			url:path+'/app/complain/getrecord',
+			type:'post',
+			dataType:'json',
+			data:{
+				'user_id':user_id,		
+			},
+			success:function(data){
+				var err=data.errmsg;
+				if(!err){
+					var content_list=document.getElementById('content_list');
+					for(var i=0;i<data.Result.length;i++){
+						if(user_name==data.Result[i]['user_name']){
+							var div=document.createElement('div');
+							div.className='news';
+							div.id='news';
+							div.innerHTML='<div class="left"><div class="sj"></div><img src="'+avatar+'" class="tx"/>'+'<p class="user_name">'+data.Result[i]['user_name']+'</p></div><p class="content1">'+data.Result[i]['content']+'</p>';
+							content_list.appendChild(div);
+						}else{
+							var div=document.createElement('div');
+							div.className='news1';
+							div.id='news1';
+							div.innerHTML='<div class="left1"><div class="sj1"></div><img src="../../images/my/admin.png" class="tx"/>'+'<p class="user_name">'+data.Result[i]['user_name']+'</p></div><p class="content1">'+data.Result[i]['content']+'</p>';
+							content_list.appendChild(div);
+						};
+					};
+				}else{
+					mui.toast(err);
+				};
+			},
+		});
+	}
+	//点击发送数据，同时插入聊天记录
+	document.getElementById('qd').addEventListener('tap',function(){
+		var content=document.getElementById('content').value;
+		if(!content){
+			mui.toast("您填写的信息不能为空！");
+		}else{
+				mui.ajax({
+				url:path+'/app/complain/sendmessage',
+				type:'post',
+				dataType:'json',
+				data:{
+					'user_id':user_id,
+					'content':content		
+				},
+				success:function(){
+					mui.toast('发送成功！');
+					document.getElementById('content').value="";
+					var content_list=document.getElementById('content_list');
+					var div=document.createElement('div');
+						div.className='news';
+						div.id='news';
+						div.innerHTML='<div class="left"><div class="sj"></div><img src="'+avatar+'"  class="tx"/>'+'<p class="user_name">'+user_name+'</p></div><p class="content1">'+content+'</p>';
+						//content_list.appendChild(div);
+						content_list.insertBefore(div, content_list.firstChild);
+				},
+				error:function(){
+					mui.toast('发送失败！');
+				},
+			});
+		}
+	});
+	document.getElementById('qx').addEventListener('tap',function(){
+		location.reload();
+	})
+</script>	
+</body>
+</html>

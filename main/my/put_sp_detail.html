@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>媒体详情页</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/main.css" /> 
+    <link rel="stylesheet" href="../../css/media_detail.css" />
+</head>
+<body>
+<div class="detail" id="detail"></div>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--JS模板-->
+<script type="text/html" id="media-detail">
+	<header class="mui-bar mui-bar-nav head" >
+		<h1 class="mui-title">{{media_name}}</h1>
+	</header>
+	<div class="sc" id="sc">
+		<img src="../../images/my/sc.png"  />
+		<p>收藏</p>
+	</div>
+	<div class="media_img" style="margin-top:60px">
+		<img id="ad_img" src="{{media_img}}" name="ad_img"  />
+	</div>
+	<div class="media_detail" >
+		<p>媒体简介：</p>
+		<span>{{media_introduction}}</span> <a id="sx" style="color:#0a9d28;font-size:13px">【详情】</a>
+	</div>
+	<div id="xq" class="xq mui-hidden" style="position:fixed;top:0px;left:0;z-index:9999;width:100%;height:100%;background-color:#ffffff;padding:30px 10px 10px 0">
+		<span style="margin-left:20px;margin-right:20px;margin-bottom:20px">{{media_introduction}}</span> 
+		<p style="width:90%;margin-top:30px;height:40px;line-height:40px;text-align:center;margin-left:5%;border:1px solid #b0b0b0" id='close'>关闭</p>
+	</div>
+	<div class="media_other" style="width:55%;float:left">
+		<p>位置：{{location}}</p>
+		<p>形式：{{style}}</p>
+		<p>规格：{{size}}</p>
+		<p>亮灯：{{lighting_time}}</p>
+		<p>流量：{{flow}}</p>
+		<p>刊例价：{{price}}</p>
+	</div>
+	<div class="media_location" style="width:43%;float:left;margin-left:2%">
+		<img id="ad_img" src="{{media_localtion_img}}" width="100px" />
+	</div>
+	<p id="sp" style="clear:both;width:100%;height:40px;text-align:center;background-color: #0a9d28;line-height: 40px;color:#ffffff;font-size:17px;margin-right:20px;border-radius:2px">查看视频图片</p>
+	<p id="close1" style="clear:both;width:100%;height:40px;text-align:center;border:1px solid #b9b9b9;line-height: 40px;color:#b9b9b9;font-size:17px;border-radius:2px">关闭</p>
+</script>
+<script type="text/javascript">
+	mui.init();
+    //获取用户ID
+    var user_id=localStorage.getItem('user_id');
+    //获取媒体数据
+	mui.plusReady(function(){
+		var id = plus.webview.currentWebview();
+		var media_id = id.media_id;
+		mui.ajax({
+			url:path+'/app/adboard/getdetails',
+			type:'post',
+			dataType:'json',
+			data:{
+				'media_id':media_id,
+				'user_id':user_id
+			},
+			success:function(data){
+				var err=data.errmsg;
+				if(!err){
+					var media_detail = document.getElementById("detail");
+					var content = template("media-detail", data);
+					media_detail.innerHTML = content;
+					//收藏广告
+					document.getElementById('sc').addEventListener('tap',function(){
+						mui.ajax({
+							url:path+'/app/adboard/collect',
+							type:'post',
+							dataType:'json',
+							data:{
+								'media_id':media_id,
+								'user_id':user_id
+							},
+							success:function(t){
+								mui.toast(t.msg);
+							},
+						});
+					});
+					download();
+					document.getElementById('sx').addEventListener('tap',function(){
+				    	document.getElementById('xq').classList.remove("mui-hidden");
+				    });
+				    document.getElementById('close').addEventListener('tap',function(){
+				    	document.getElementById('xq').classList.add("mui-hidden");
+				    });
+				    document.getElementById('sp').addEventListener('tap',function(){
+						var btnArray=['取消','确定'];
+						 mui.prompt("","请输入5位随机数","图片视频验证码",btnArray,function(e){  
+						if(e.index==0){
+							
+						}else {
+							var rand=e.value;
+							mui.ajax({
+								url:path+'/app/puton/putonsp',
+								type:'post',
+								dataType:'json',
+								data:{
+									'media_id':media_id,
+									'rand':rand
+								},
+								success:function(data){
+									var err=data.errmsg;
+									if(!err){
+										mui.openWindow({
+											url: "video_img.html",
+											waiting: {
+												autoShow: false
+											},
+											//传递媒体的id到media_detail.html
+											extras: {
+												media_id: media_id
+												}
+										});
+									}else{
+										mui.toast(err);
+									};	
+								}	
+							})
+						}
+						},'div')
+				    });
+				     document.getElementById('close1').addEventListener('tap',function(){
+				    	mui.back();
+				    });
+				}else{
+					mui.toast(err);
+				};
+			},
+		});
+	});
+</script>	
+<script type="text/javascript" src="../../js/downloadImage.js" ></script>
+</body>
+</html>

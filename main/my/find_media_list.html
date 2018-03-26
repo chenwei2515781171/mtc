@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>媒体查找结果</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+    <style>
+    	.media_collect p{width: 100%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; }
+    	.ss-p{height:30px;width:90%;margin:0 auto;border:1px solid #0a9d28;margin-top:40px;border-radius:20px;overflow: hidden;}
+    	.ss-p input{height:30px;width:80%;border:0px solid #fff;text-align:center}
+    	.ss-p span{float:right;color:#0a9d28;margin-right:20px;line-height:30px;}
+    	.media{margin-top:10px}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">媒体搜索</h1>
+	</header>
+	<p class="ss-p">
+		<input type="text" name="position" id="position" placeholder="请输入媒体位置关键字"/>
+		 <span id="ss" class="mui-icon mui-icon-search" ></span>
+	</p>
+	<div class='media' id="media"></div>
+	<p id="dj" class="dj"> </p>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+
+<script type="text/javascript">
+	mui.init();
+	var user_id= localStorage.getItem('user_id');
+	//遍历媒体节点，添加点击事件
+	function goto_media_detail(){
+		var list_id=document.getElementsByClassName('media_collect');
+		var media_id='';
+		for(var i=0;i<list_id.length;i++){
+			list_id[i].addEventListener('tap',function(){
+				media_id=this.getAttribute("id");
+				
+				mui.openWindow({
+					url: "find_media_detail.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						media_id: media_id,
+						
+					}
+			    });
+			    
+			});
+		}
+	}
+	document.getElementById('ss').addEventListener('tap',function(){
+			var position=document.querySelector('input[name="position"]').value;
+			if(!position){
+				mui.toast("请输入媒体位置！")
+			};
+			var table = document.body.querySelector('.media');
+			table.innerHTML="";
+			mui.ajax({
+				url:path+'/app/find/findmedialist',
+				type:'post',
+				dataType:'json',
+				data:{
+					"position":position
+				}, 
+				success:function(data){
+					var no_data=document.getElementById('dj');
+					var err=data.errmsg;
+					if(!err){
+							var media_list = document.getElementById("media");
+							for(var i=0;i<data.Result.length;i++){
+								var div=document.createElement('div');
+								div.className='media_collect';
+								div.id=data.Result[i]['media_id'];
+								var img=data.Result[i]['media_img'];
+								var name=data.Result[i]['media_name'];
+								div.innerHTML='<img src="'+img+'"/><p>'+name+'</p>';
+								media_list.appendChild(div);
+							};
+							goto_media_detail();
+							no_data.innerText="";
+					}else{
+						no_data.innerText="此处暂无媒体提供！";
+					};
+				},
+			});
+		});
+
+</script>	
+</body>
+</html>

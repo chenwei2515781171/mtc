@@ -1,0 +1,41 @@
+.select_images{height:3rem;width:100%;display:none}
+.media-introduction-detail{display:none;position:absolute;top:5rem;bottom:0;left: 0;right:0;background-color:#FFFFFF}
+.head{background-color: #0a9d28;height: 37px;}   
+.mui-title{color: #ffffff;line-height: 37px;font-size: 1.1rem;}
+.mui-bar .mui-icon{line-height: 37px;padding-top: 0px;color: #fff;} 
+.content{margin-top:55px;}
+.content .st{margin-left:3%;margin-right:2%;width:44%;display:inline-block;padding:0px;border:0px;}  
+.st img{width:100%;height:140px} 
+.st p{font-size:15px;color:#000}
+.st p span,.jj a span{color:red} 
+.mui-btn{border:0px} 
+.content .bt{margin-top:0px}
+.content .jj{text-indent: 0;padding-left:8px;padding-right:12px;padding-bottom:15px;width:100%;margin:0 auto}
+.content .jj a{color:#000;border:1px solid #8F8F94}
+.content .company{font-size:18px;color:#000;margin-bottom: 5px;}
+.content .company1{margin-left:15px;margin-right:15px;width:90%;}
+.content .log{text-align:center;line-height:3rem;color: #ffffff;background-color: #0a9d28;margin-bottom: 0;width: 100%;margin:0 auto;border: 0px solid #e1e1e1;border-radius: 0.2rem;height: 3rem;font-size: 1rem}
+.content .tk{width:100%;border-radius: 0px;
+position: absolute;
+    width: 96%;
+    height: 850px;
+    top: 40px;
+    left: 2%;
+    background-color:#efeff4;
+    padding-top: 10px;
+    font-size:1rem;
+}
+.content .tk p{margin-top:5px;margin-bottom: 5px;color:#000000;}
+.content  p span{color:red}
+.content .import{margin-bottom:10px;height:35px}
+.content .lz{text-align: center;margin-bottom:20px;margin-top:20px}
+#qd{margin-right:10px}
+#qd,#qx{width:25%;display: inline-block;text-indent: 0px;height: 2.5rem;line-height: 2.5rem;}
+#qd a,#qx a{color:#fff}
+b{font-weight: normal;}
+.media{margin-top:40px;padding:5px;}
+.media_collect{overflow:hidden;width: 33.33%;float:left;text-align: center;}
+.media_collect img{width:95%;}
+.media_collect p{text-align: center;font-size: 0.8rem;margin: 0;color: #000;margin-top:0px;margin-bottom:0.2rem}
+.dj{clear:both;text-align:center;font-size:1rem;}
+.jz{padding-top:1rem}

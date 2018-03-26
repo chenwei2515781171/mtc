@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>已报备媒体</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+    <style>
+    	#check,#success{clear:both;width:100%;height:40px;text-align:center;background-color: #0a9d28;line-height: 40px;color:#ffffff;font-size:17px;margin-right:20px;border-radius:2px}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">已报备媒体</h1>
+	</header>
+	<div class='media' id="media">
+		<p id="check" >正在审核</p>
+		<p id="success" >成功报备</p>
+	</div>
+	
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script>
+	mui.init();
+	document.getElementById("check").addEventListener('tap',function(){
+		mui.openWindow("report_check.html");
+	});
+	document.getElementById("success").addEventListener('tap',function(){
+		mui.openWindow("report_success.html");
+	})
+</script>
+</body>
+</html>

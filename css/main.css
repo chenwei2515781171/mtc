@@ -1,0 +1,8 @@
+body{background-color:#fff}
+.head{background-color: #0a9d28;height:37px;}
+.mui-title{color:#ffffff;font-size:1.1rem}
+.mui-slider{width:100%;height:100%;overflow:hidden;}
+.mui-slider-item{text-align:center;}
+.img_id1{position:relative;width:33.33%;float:left;overflow:hidden;text-align: center;}
+.img_id{position:relative;width:33.33%;float:left;overflow:hidden;text-align: center;}
+.media_title{text-align:center;width:100%;font-size:0.9rem;display: block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;margin:0;padding:0; }

@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>注册</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/login.css" rel="stylesheet" />
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../js/md5.js" ></script>
+		<link rel="stylesheet" type="text/css" href="../css/login.css" />
+		<link href="../css/mui.picker.css" rel="stylesheet" />
+		<link href="../css/mui.poppicker.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/Hui.css" />
+		<link rel="stylesheet" href="../css/register.css" />
+		<style>
+			.form-width{width:100%}
+			.phone_num span,.phone_password span{color:#0a9d28;float:left;padding-left:20px;line-height: 2.6rem;}
+			.grxx span{color:#0a9d28}
+			.xx-div{margin-top:40px}
+			.register{width:100%}
+			.jj-te{width:100%;border-bottom:1px solid #b0b0b0}
+			.usertype{color:#0a9d28}
+		</style>
+	</head>
+	<body >
+		<header class="mui-bar mui-bar-nav head">
+		    <h1 class="mui-title">大牌监测猫</h1>
+		</header>
+		<form class='reg-input animated fadeInDown form-width' >
+			<div class="phone_num">
+				<span class="H-iconfont H-icon-phone" ></span>
+				
+				<input name="phone_num" id="phone_num" class="import style " placeholder="请输入手机号" type="text" />
+			</div>
+			<div class="phone_password">
+				<span class="H-iconfont H-icon-lock"></span>
+				
+				<input name="password" id="password" class="import style" placeholder="请输入密码"  type="password"  />
+			</div>
+			<div class="grxx" id="grxx">
+				<span>个人信息</span>
+			</div>
+			<div class="xx mui-hidden" id="xx" >
+				<div class="mui-input-row mui-radio mui-radio xx-div" >
+					<label>个人</label>
+				    <input name="radio" type="radio" value='1' checked>
+				    <label>公司</label>
+				    <input name="radio" type="radio" value='2' >
+				</div>
+				<input type="text" name="name" id="name" class='import jj jj-te' placeholder="请输入您的用户名" />
+				<div class='usertype'>
+					<span>身份属性：</span>
+					<select  id='groupid' name="groupid">
+						<option value="请选择">请选择</option>
+						<option value="1">游客</option>
+						<option value="2">广告主</option>
+						<option value="3">媒体主</option>
+						<option value="4">代理商</option>
+					</select> 
+				</div>
+				<div class='city' id="city">
+					<button id='showCityPicker3' class="mui-btn mui-btn-block import loginaction qy" type='button' style="width:100%;color:#0a9d28">区域信息</button>
+					<div id='cityResult3' class="ui-alert"></div>
+				</div>
+				<input name="qr" type="button" id="qr" class="import loginaction" value="提交个人信息" style="width:100%;font-size:0.9rem"/>
+			</div>
+		</form>
+		<div class="register">
+			<input name="register" type="button" id="register" class="import loginaction" value="注册" style="width:100%;font-size:0.9rem"/>
+			<input name="register" type="button" id="login" class="import loginaction" value="账号登录" style="width:100%;margin-top:50px;font-size:0.9rem"/>
+		</div>
+		<script src="../js/mui.picker.js"></script>
+		<script src="../js/mui.poppicker.js"></script>
+		<script src="../js/city.data.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/city.data-3.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/url.js" ></script>
+		<script type="text/javascript">
+			mui.init();
+			//显示区域信息选择框
+			var province,city,county;
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+					/**
+					 * 获取对象属性的值
+					 * 主要用于过滤三级联动中，可能出现的最低级的数据不存在的情况，实际开发中需要注意这一点；
+					 * @param {Object} obj 对象
+					 * @param {String} param 属性名
+					 */
+					var _getParam = function(obj, param) {
+						return obj[param] || '';
+					}; 
+				
+					//级联示例
+					var cityPicker3 = new $.PopPicker({
+						layer: 3
+					});
+					cityPicker3.setData(cityData3);
+					var showCityPickerButton = doc.getElementById('showCityPicker3');
+					var cityResult3 = doc.getElementById('cityResult3');
+					showCityPickerButton.addEventListener('tap', function(event) {
+						cityPicker3.show(function(items) {
+							cityResult3.innerText = _getParam(items[0], 'text') + " " + _getParam(items[1], 'text') + " " + _getParam(items[2], 'text');
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+							province=_getParam(items[0], 'text');
+							city=_getParam(items[1], 'text');
+							county=_getParam(items[2], 'text');
+						});
+						
+					}, false);
+				});
+			})(mui, document);
+			//个人信息
+			document.getElementById('grxx').addEventListener('tap',function(){
+				document.getElementById('xx').classList.remove("mui-hidden");
+			});
+			document.getElementById('qr').addEventListener('tap',function(){
+				document.getElementById('xx').classList.add("mui-hidden");
+			});
+			//账号登录
+			document.getElementById('login').addEventListener('tap',function(){
+				mui.back()
+			});
+			//获取用户填写的信息并提交注册
+			document.getElementById('register').addEventListener('tap',function(){
+				var phone_num=document.querySelector('input[name="phone_num"]').value;
+				var password=document.querySelector('input[name="password"]').value;
+				var user_type=document.querySelector('[name="radio"]:checked').value;
+				var name=document.querySelector('input[name="name"]').value;
+				var groupid=document.getElementById('groupid').value;
+				if (!phone_num||!password||!name) {
+					mui.toast('您输入的信息不能为空！');
+					return;
+				};
+				if (groupid==="请选择") {
+					mui.toast('请选择您的身份属性！');
+					return;
+				};
+				//验证手机号是否符合规定
+				var reg=/^1(3[0-9]|4[5-7]|5[0-35-9]|7[0135678]|8[0-9])\d{8}$/;
+				if(!reg.test(phone_num)) {
+					mui.toast("你输入的手机号无效！");
+					return;
+				};
+				//对密码进行md5加密
+				var jm_password='mtc'+hexMD5(password);
+				//提交注册信息
+				mui.ajax({
+					url:path+'/app/public/register',
+					type:'post',
+					dataType:'json',
+					data:{
+						'phone_num':phone_num,
+						'password':jm_password,
+						'user_type':user_type,
+						'name':name,
+						'groupid':groupid,
+						'province':province,
+						'city':city,
+						'county':county
+					},
+					success:function(t){
+						var err=t.errmsg;
+						if(!err){
+							mui.toast(t.data);
+							mui.later(function(){
+								mui.back();
+							},2000);
+						}else{
+							mui.toast(t.errmsg);
+						};
+					},
+				});
+			});
+		</script>
+	</body>
+</html>

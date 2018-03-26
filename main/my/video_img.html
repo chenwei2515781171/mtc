@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>媒体</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/main.css" /> 
+    <link rel="stylesheet" href="../../css/media_detail.css" />
+    <style>
+        body{margin:0;text-align: center;}
+        video{max-width: 1200px;width: 100%;}
+        #close1{clear:both;width:100%;height:40px;text-align:center;border:1px solid #b9b9b9;line-height: 40px;color:#b9b9b9;font-size:17px;border-radius:2px;margin-top:10px}
+	</style>
+</head>
+<body>
+<div class="detail" id="detail"></div>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<script src="https://open.ys7.com/sdk/js/1.3/ezuikit.js "></script>
+<!--JS模板-->
+<script type="text/html" id="media-detail">
+	<header class="mui-bar mui-bar-nav head" >
+		<h1 class="mui-title">{{device_name}}</h1>
+	</header>
+	<!--<div class="media_img" style="margin-top:60px;margin-bottom:0px;padding:0">
+		<img id="ad_img" src="{{img_1}}" name="ad_img" style="margin:0;padding:0" />
+	</div>-->
+	<div class="media_detail" style="margin:0;padding:0">
+		<video id="myPlayer" poster="../../images/login/bg.jpg" controls playsInline webkit-playsinline autoplay>
+    		<source src="{{vedio_rtmpURL}}" type="" />
+    		<source src="{{vedio_httpURL}}" type="application/x-mpegURL" />
+		</video>
+	</div>
+
+	<p id="close1" >关闭</p>
+</script>
+<script type="text/javascript">
+	mui.init();
+    //获取用户ID
+    var user_id=localStorage.getItem('user_id');
+    //获取媒体数据
+	mui.plusReady(function(){
+		var li = plus.webview.currentWebview();
+		var device_id = li.device_id;
+		mui.ajax({
+			url:path+'/app/puton/putonsplink',
+			type:'post',
+			dataType:'json',
+			data:{
+				'device_id':device_id,
+			},
+			success:function(data){
+				var media_detail = document.getElementById("detail");
+				var content = template("media-detail", data.Result);
+				media_detail.innerHTML = content;
+				document.getElementById('close1').addEventListener('tap',function(){
+				    mui.back();
+				});
+				
+			    var player = new EZUIPlayer('myPlayer');
+			    player.on('error', function(){
+			        console.log('error');
+			    });
+			    player.on('play', function(){
+			        console.log('play');
+			    });
+			    player.on('pause', function(){
+			        console.log('pause');
+			    });
+
+
+				var nums=data.Result.view_time;
+				clock = setInterval(doLoop, 1000);
+				function doLoop() {
+					nums--;
+					if(nums==0) {
+						clearInterval(clock);
+					   mui.back();
+					};
+				};
+			},
+		});
+		
+	});
+</script>	
+
+</body>
+</html>

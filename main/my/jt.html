@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <script src="../../js/caijian/js/mui.js"></script>
+        <link href="../../js/caijian/css/mui.min.css" rel="stylesheet" />
+        <link href="../../js/caijian/css/iconfont.css" rel="stylesheet" />
+        <link rel="stylesheet" href="../../js/caijian/css/cropper.css" />
+
+        
+        <script type="text/javascript" src="../../js/caijian/js/fastclick.js"></script>
+        <script type="text/javascript" src="../../js/caijian/js/exif.js"></script>
+        <link href="../../js/caijian/css/user-information.css" rel="stylesheet" />
+        <script>
+            window.addEventListener('load', function() {
+                FastClick.attach(document.body);
+            }, false);
+        </script>
+    </head>
+
+    <body>
+        <div id="cropper-example-1">
+            <img id="im" alt="Picture" style="height:100%;width:100%;">
+        </div>
+
+        <div class="divbut">
+            <div>
+                <p id="quxiao" class="iconfont icon-quxiao"></p>
+            </div>
+            <div>
+                <p id="xuanqu" class="iconfont icon-queding"></p>
+            </div>
+        </div>
+        <div id="test" style="position: absolute;"></div>
+    </body>
+    <script type="text/javascript" src="../../js/caijian/js/jquery-1.11.2.min.js"></script>
+    <script src="../../js/caijian/js/cropper.min.js"></script>
+    <!--script src="js/cropper-img.js"></script -->
+    <script type="text/javascript">
+
+        /*$(function() {
+            ! function() {
+                var i = {
+                    aspectRatio: 1 / 1
+                };
+            }()
+        });*/
+        (function(c) {
+
+            var Cro = function() {}
+            c.extend(Cro.prototype, {
+                orientation: null,
+                simg: null,
+                simg2: null,
+                urldata: null,
+                view: null,
+                num: 0,
+                sbx: null,
+                sby: null,
+                n: 0,
+                imgurl: null,
+                weizhi: null,
+                imageData: null,
+                onReady: function() {
+                    var that = this;
+                    mui.init();
+                    that.bindEvent();
+                    that.view = plus.webview.currentWebview();
+
+                    that.simg = document.createElement("img");
+                    that.simg.setAttribute("id", "simg");
+                    document.body.appendChild(that.simg);
+
+                    var url = that.view.path;
+                    var img = document.createElement("img");
+                    img.setAttribute("src", url);
+
+                    console.log('原始截取图片路径: ' + url);
+
+                    //判断图片是否已经加载完，如果已经加载完，则执行下面的函数。
+                    img.addEventListener("load", function() {
+
+                        EXIF.getData(img, function() {  //调用EXIF解决，图片旋转90的问题
+
+                            var orientation = EXIF.getAllTags(this).Orientation;
+
+                            //本地压缩图片。
+                            that.loadcopyImg( img, orientation, url );
+
+                        });
+                    })
+                },
+                cropperImg: function() {    //加载图片截取框
+                    var that = this;
+
+                    $('#cropper-example-1 > img').cropper({
+                        aspectRatio: 4/3,     //长宽的比例
+                        autoCropArea: 1,      //拆减图片框框的大小
+                        strict: true,           //默认值true。 在strict模式中，canvas不能小于容器，剪裁容器不能再canvas之外。
+                        background: false,      //是否在容器上显示网格背景。
+                        guides: true,           //是否在剪裁框上显示虚线
+                        highlight: false,       //是否在剪裁框上显示白色的模态窗口。
+                        dragCrop: false,        //是否允许移除当前的剪裁框，并通过拖动来新建一个剪裁框区域。
+                        movable: false,         //是否允许移动剪裁框。
+                        resizable:false,       //是否允许改变剪裁框的大小。
+                        crop: function(data) {
+
+                            that.weizhi = data; //将当前截取区域的位置 和 大小放入全局变量中
+
+                            that.imageData = $('#cropper-example-1 > img').cropper('getImageData');  //将当前图片的信息放入全局参数中去
+
+                            console.log('getImageData: ' + JSON.stringify( that.imageData ) );
+                            console.log('weizhi: ' + JSON.stringify( that.weizhi ));
+                        }
+                    });
+                },
+                loadcopyImg: function(img, opt,url) {   //本地处理图片。将图片进行压缩
+                    var that = this;
+
+                    var name="_doc/upload/F_ZDDZZ_"+ ( new Date() ).valueOf() +".jpg"; //拼装唯一图片值  
+                    plus.zip.compressImage({
+                            src:url,        //src: (String 类型 )压缩转换原始图片的路径  
+                            dst:name,       //压缩转换目标图片的路径  
+                            quality:20,     //quality: (Number 类型 )压缩图片的质量.取值范围为1-100  
+                            overwrite:true  //overwrite: (Boolean 类型 )覆盖生成新文件  
+                        },  
+                        function(event) {
+                            var path = name;            //压缩转换目标图片的路径
+                            console.log( '本地压缩图片成功：' + event.target);
+
+                            that.imgurl = event.target; //将压缩后的图片放入全局变量中
+
+                            $("#im").attr("src", event.target );    //显示压缩后的图片
+                            //$("#im").attr("src", 'file:///var/mobile/Containers/Data/Application/67789E0B-1848-4491-A225-E25B1C645A26/Documents/Pandora/apps/HBuilder/doc/upload/F_cutOut_1504768316962.jpg');
+                            that.cropperImg();  //调用截取框
+
+                        },function(error) {  
+                            plus.nativeUI.toast("压缩图片失败，请稍候再试");  
+                    });
+
+                },
+                bindEvent: function() {                 //绑定事件
+                    document.getElementById("quxiao").addEventListener("click", function() {
+                        window.cro.view.close();
+                    });
+                    document.getElementById("xuanqu").addEventListener("click", function() {
+                        //window.cro.showFace(window.cro.urldata);
+                        window.cro.jieQu();
+                    });
+                },
+                jieQu: function(){
+                    console.log('截取开始');
+                    var date = (new Date()).valueOf();  //时间戳，避免截图后的文件名相同
+                    var that = this;
+
+                    //计算各个数值的百分比
+                    var top_Precentage = ( that.weizhi.y / that.imageData.naturalHeight ).toFixed(2) * 100 + '%';
+                    var left_Precentage = ( that.weizhi.x / that.imageData.naturalWidth ).toFixed(2) * 100 + '%';
+                    var width_Precentage = ( that.weizhi.width / that.imageData.naturalWidth ).toFixed(2) * 100 + '%';
+                    var height_Precentage = ( that.weizhi.height / that.imageData.naturalHeight ).toFixed(2) * 100 + '%';
+
+                    console.log( top_Precentage + " | " + left_Precentage + " | " + width_Precentage + " | " + height_Precentage );
+                    //通过压缩按比例截取图片
+                    plus.zip.compressImage({
+                        src: that.imgurl,   //src在这里是第一步Url里的src。也就是本地路径
+                        dst: '_doc/upload/F_cutOut_'+ date +'.jpg',
+                        overwrite: true,
+                        clip: {
+                          top: top_Precentage, 
+                          left: left_Precentage,
+                          width: width_Precentage,
+                          height: height_Precentage 
+                        } 
+                      },
+                      function( event ) {
+                        console.log('截取后的图片路径：' + event.target);
+
+                        var vNextPage = plus.webview.getWebviewById( 'new_resource.html' );
+                        if( vNextPage != null ){
+
+                            mui.fire( vNextPage, 'newsId',{
+                                urlPath : event.target
+                            });
+                        }else{
+                            console.log( '跳转失败 ');
+                        }
+
+                        window.cro.view.close();/**/
+                        $("#im").attr("src", event.target ); //压缩图片
+                      }
+                    );
+                }
+
+            });
+            window.cro = new Cro();
+            c.plusReady(function() {
+                window.cro.onReady();
+            })
+        })(mui)
+    </script>
+
+</html>

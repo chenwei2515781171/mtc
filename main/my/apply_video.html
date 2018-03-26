@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>申请安装摄像头</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+     <link rel="stylesheet" type="text/css" href="../../css/mui.picker.min.css" />
+	<link rel="stylesheet" href="../../css/report.css" />
+    <style>
+    	.content{margin-top:65px;}
+    	.content p{font-size:1rem;color:#000}
+    	.content .import{height:2rem}
+    	.content select,.media_ways select,.media_lists select{font-size:1rem;border:1px solid rgba(0,0,0,.2) !important}
+    	span{color:#000000}
+    	.log{font-size:1rem;}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">申请安装摄像头</h1>
+	</header>
+	<div class="content">
+		<p>摄像头类型<span>*</span></p>
+		<select  id='camera_type' name="camera_type">
+					<option value="请选择">请选择</option>
+					<option value="球型摄像头">球型摄像头</option>
+					<option value="一体化摄像头">一体化摄像头</option>
+					<option value="普通枪式摄像头">普通枪式摄像头</option>
+					<option value="其他">其他</option>
+		</select> 
+		<p>申请媒体<span>*</span></p>
+		<div class='media_lists' id="media_lists"></div>
+		<div class="lz">
+			<p class="log" id="qd">提交</p>
+			<p class="log" id="qx">取消</p>
+		</div>
+		<p style="text-align: center;">媒体未上传？点这里<span id="upload" style="color:#0a9d28">媒体上传</span></p>
+	</div>
+<script src="../../js/mui.min.js"></script>
+<script type="text/javascript" src="../../js/template.js" ></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<script src="../../js/mui.picker.min.js"></script>
+<!--所属用户媒体列表模板-->
+<script type="text/html" id='media-list'>
+	<select  id='media' name="media">
+		<option value="请选择">请选择</option>
+		{{each Result_media as value  i}}
+			<option value="{{value.media_id}}">{{value.media_name}}</option>
+		{{/each}}
+	</select> 
+</script>
+<!--媒体形式列表模板-->
+<!--<script type="text/html" id='ways-list'>
+	<select  id='ways' name="ways">
+		<option value="请选择">请选择</option>
+		{{each Result_ways as value  i}}
+			<option value="{{value.media_ways_id}}">{{value.media_ways_name}}</option>
+		{{/each}}
+	</select> 
+</script>-->
+<script type="text/javascript">
+	mui.init();
+	var user_id= localStorage.getItem('user_id');
+	var type=localStorage.getItem('type');
+	if(type==1){
+		mui.toast("需要修改账户身份，才能上传！");
+		mui.later(function(){
+			mui.openWindow({
+				url: "require_my_imformation.html",
+				waiting: {
+					autoShow: false
+				}
+			});	
+		},2000);
+	}
+	//获取媒体形式列表和登录账户自己的媒体列表
+	mui.plusReady(function(){
+		var name = plus.webview.currentWebview();
+		var media_name = name.media_name;
+		var media_id=name.media_id;
+		
+		if(!media_name){
+				mui.ajax({
+					url:path+'/app/camera/usermedialist',
+					type:'post',
+					dataType:'json',
+					data:{
+						'user_id':user_id
+					},
+					success:function(data){
+						var err=data.errmsg;
+						if(!err){
+							var media_list=document.getElementById('media_lists');
+							var media_content = template("media-list", data);
+							media_list.innerHTML = media_content;
+			//				var ways_list=document.getElementById('media_ways');
+			//				var ways_content = template("ways-list", data);
+			//				ways_list.innerHTML = ways_content;
+						}else{
+							mui.toast(err);
+						};
+					},
+				});
+		}else{
+			var html='<select  id="media" name="media"><option value="'+media_id+'">'+media_name+'</option></select> ';
+			var media_list=document.getElementById('media_lists');
+			media_list.innerHTML = html;
+		}
+	});
+//			//选择起始时间、结束时间
+//	(function($) {
+//		$.init();
+//		//选择投放起始时间
+//		var put_time_start=document.getElementById('put_time_start');
+//		put_time_start.addEventListener('tap',function(){
+//			var optionsJson = this.getAttribute('data-options');
+//			var options = JSON.parse(optionsJson);
+//			var picker = new $.DtPicker(options);
+//			picker.show(function(rs) {	
+//				put_time_start.value=rs.text;
+//				picker.dispose();
+//			});
+//		}, false);
+//		//选择投放结束时间
+//		var put_time_end=document.getElementById('put_time_end');
+//		put_time_end.addEventListener('tap',function(){
+//			var optionsJson = this.getAttribute('data-options');
+//			var options = JSON.parse(optionsJson);
+//			var picker = new $.DtPicker(options);
+//			picker.show(function(rs) {	
+//				put_time_end.value=rs.text;		
+//				picker.dispose();
+//			});
+//		}, false);
+//	})(mui);
+	//提交
+	document.getElementById('qd').addEventListener('tap',function(){
+		var camera_type=document.getElementById('camera_type').value;
+		var media_id=document.getElementById('media').value;
+//		var media_ways=document.getElementById('ways').value;
+//		var media_size=document.querySelector('input[name="width"]').value+"米x"+document.querySelector('input[name="height"]').value+"米"+document.querySelector('[name="mian"]:checked').value;
+//		var light_time=document.querySelector('input[name="put_time_start"]').value+"-"+document.querySelector('input[name="put_time_end"]').value;
+		if(!camera_type||!media_id){
+			mui.toast("您填写的信息不能为空！");
+		}else{
+				mui.ajax({
+				url:path+'/app/camera/installcamera',
+				type:'post',
+				dataType:'json',
+				data:{
+					'user_id':user_id,
+					'camera_type':camera_type,
+					'media_id':media_id,
+//					'media_ways':media_ways,
+//					'media_size':media_size,
+//					'light_time':light_time			
+				},
+				success:function(t){
+					var err=t.errmsg;
+					if(!err){
+						mui.toast(t.data);
+					}else{
+						mui.toast(err);
+					};	
+					mui.later(function(){
+						mui.back()
+					},2000);
+				},
+			});
+		}
+	});
+	//取消
+	document.getElementById('qx').addEventListener('tap',function(){
+		mui.back();
+	});
+	//跳转我有新资源页面
+	document.getElementById('upload').addEventListener('tap',function(){
+		mui.openWindow({
+			url: "new_resource.html",
+			waiting: {
+				autoShow: false
+			}		
+		});
+	})
+	
+</script>	
+</body>
+</html>

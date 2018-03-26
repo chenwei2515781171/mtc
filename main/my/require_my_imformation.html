@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>更改个人信息</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+    <style>
+    	.content{margin-top:80px;margin-left:50px;margin-right:50px}
+    	.content p{font-size:1rem;color:#000}
+    	.content .import{height:40px;font-size:1rem}
+    	.yz{width: 100%;height: 40px;border: 0px solid #e1e1e1;margin-bottom: 10px;text-align: right;}
+    	#yzm,#hq{width:45%;height:100%;float:left;font-size:1rem}
+    	#yzm{margin-right:20px}
+    	.content .explain{color:red;margin-top:20px;font-size:0.8rem}
+    	.usertype select{border:1px solid #e1e1e1 !important;font-size:1rem}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">更改个人信息</h1>
+	</header>
+	<div class="content">
+		<p>名称：</p>
+		<input name="use_name" id="use_name" class="import"  type="text" placeholder="请输入您的名称" />
+		<div class='usertype'>
+				<p>身份属性：</p>
+				<select  id='type' name="type">
+					<option value="请选择">请选择</option>
+					<option value="1">游客</option>
+					<option value="2">广告主</option>
+					<option value="3">媒体主</option>
+					<option value="4">代理商</option>
+				</select> 
+		</div>
+		<p>手机号:</p>
+		<input name="phone_num" id="phone_num" class="import"  type="text" placeholder="请输入您更改后的手机号"/>
+		<div class="yz">
+			<input name="yzm" id="yzm" class="import" type="text" >
+			<input type="button" id="hq" class="import" value="获取验证码" />
+		</div>
+		<span id="yz"></span>
+		<div class="lz">
+			<p class="log" id="qd">更改</p>
+			<p class="log" id="qx">取消</p>
+		</div>
+		<p class="explain">注释：需要更改手机号，需要获取当前登录账户手机号的验证码</p>
+	</div>
+<script src="../../js/mui.min.js"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<script type="text/javascript">
+	mui.init();
+	var num='';
+	var clock = '';
+	var nums = 120;
+	var user_id=localStorage.getItem('user_id');
+	var user_name=localStorage.getItem('user_name');
+	var type=localStorage.getItem('type');
+	
+	document.getElementById("use_name").value =user_name;
+	var option=mui(".usertype option");
+	for(var i=0;i<option.length;i++){
+		var val=option[i].value;
+		if(type==val){
+			option[i].selected='selected';
+		}
+	}
+	//随机生成4位数的验证码,发送手机短信，倒计时防刷新
+	document.getElementById('hq').addEventListener('tap',function(){
+		var phone_num1=document.querySelector('input[name="phone_num"]').value;
+		if(!phone_num1){
+			mui.toast("手机号不能为空！");
+			return;
+		};
+		var number="";
+		for(var i=0;i<4;i++){  
+    		number+=Math.floor(Math.random()*9+1); 
+		};
+		num=number;
+		hq.disabled = true;
+        hq.value = '重新发送' + nums + 's';
+        hq.style.color = '#999';
+        mui.toast("验证码已发送!");
+        mui.ajax({
+            url:path+'/app/public/getverrifycode',
+            type:'post',
+            dataType:'json',
+            data:{
+				'phone_num':phone_num1,
+				'verifyCode':num
+			},
+			success:function(data){
+				var err=data.errmsg;
+				if(!err){
+					mui.toast('验证码已发送！');
+				}else{
+					mui.toast(err);
+				};
+			},
+        });
+        clock = setInterval(doLoop, 1000);
+	});
+	function doLoop() {
+		nums--;
+		if(nums > 0) {
+		hq.value = '重新发送' + nums + 's';
+		} else {
+			clearInterval(clock); //清除js定时器
+			num="";
+			hq.disabled = false;
+			hq.value = '获取验证码';
+			hq.style.color = '#999';
+			nums = 120; //重置时间
+		}
+	};
+	//点更改提交数据
+	document.getElementById('qd').addEventListener('tap',function(){
+		
+		var phone_num=document.querySelector('input[name="phone_num"]').value;
+		var yzm=document.querySelector('input[name="yzm"]').value;
+		var use_name=document.querySelector('input[name="use_name"]').value;
+		var type=document.getElementById('type').value;
+		
+		if(phone_num!=''){
+			if(!yzm){
+				mui.toast("您输入的验证码不能为空！");
+				return;
+			};
+			if(yzm!=num){
+				mui.toast("您输入的验证码不正确，请重新输入！");
+				return;
+			};
+		};
+		mui.ajax({
+			url:path+'/app/change/changeinfo',
+			type:'post',
+			dataType:'json',
+			data:{
+				'user_id':user_id,
+				'phone_num':phone_num,
+				'user_name':use_name,
+				'type':type
+			},
+			success:function(t){
+				var err=t.errmsg;
+				if(!err){
+					mui.toast("修改成功，请重新登录！");
+					mui.later(function(){
+						localStorage.clear();
+						plus.runtime.restart();
+					},2000);
+				}else{
+					mui.toast(err);
+				};
+			},
+		});
+	});
+	document.getElementById('qx').addEventListener('tap',function(){
+		mui.back();
+	})
+</script>	
+</body>
+</html>

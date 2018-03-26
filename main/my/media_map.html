@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>媒体报备</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="../../css/mui.picker.min.css" />
+	<link rel="stylesheet" href="../../css/report.css" />
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">媒体报备</h1>
+	</header>
+	<div class="content">
+		<p>项目或产品名称<span>*</span></p>
+		<input name="product_name" id="product_name" class="import"  type="text" />
+		<p>所属行业<span>*</span></p>
+		<div class='belong_industry' id="belong_industry"></div>
+		<p>媒体形式<span>*</span></p>
+		<div class='media_ways' id="media_ways"></div>
+		<p>投放时间<span>*</span></p>
+		<div class="put_time">
+			<span>起:</span>
+			<input id="put_time_start" data-options='{"type":"date"}' name="put_time_start" type="text" value="请选择" />
+			<span>至:</span>
+			<input id="put_time_end" data-options='{"type":"date"}' name="put_time_end" type="text" value="请选择" />
+		</div>
+		<!--<p>投放区域<span>*</span></p>
+		<input name="put_position" id="put_position" class="import"  type="text" />-->
+		<p>投放信息<span>*</span></p>
+		<input name="put_information" id="put_information" class="import"  type="text" />
+		<p>投放预算</p>
+		<input name="put_budget" id="put_budget" class="import"  type="text" />
+		<p>客户名称</p>
+		<input name="customer_name" id="customer_name" class="import"  type="text" />
+		<div class="lz">
+			<p class="log" id="qd">提交</p>
+			<p class="log" id="qx">取消</p>
+		</div>
+	</div>
+<script src="../../js/mui.min.js"></script>
+<script type="text/javascript" src="../../js/template.js" ></script>
+<script src="../../js/mui.picker.min.js"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--所属行业列表模板-->
+<script type="text/html" id='industry-list'>
+	<select  id='industry' name="industry">
+		<option value="请选择">请选择</option>
+		{{each Result_industry as value  i}}
+			<option value="{{value.media_industry_id}}">{{value.media_industry_name}}</option>
+		{{/each}}
+	</select> 
+</script>
+<!--//媒体形式列表模板-->
+<script type="text/html" id='ways-list'>
+	<select  id='ways' name="ways">
+		<option value="请选择">请选择</option>
+		{{each Result_ways as value  i}}
+			<option value="{{value.media_ways_name}}">{{value.media_ways_name}}</option>
+		{{/each}}
+	</select> 
+</script>
+<script type="text/javascript">
+	mui.init();
+	var user_id=localStorage.getItem('user_id');
+	var media_id;
+		//返回媒体显示媒体
+	mui.plusReady(function(){
+		var id= plus.webview.currentWebview();
+		media_id=id.media_id;
+//		media_name=id.media_name;
+//		document.getElementById("media_id").value =media_name;
+	});
+	//获取所属行业、媒体形式列表
+	mui.ajax({
+		url:path+'/app/camera/usermedialist',
+		type:'post',
+		dataType:'json',
+		data:{
+			'user_id':user_id
+		},
+		success:function(data){
+			var ways_list=document.getElementById('media_ways');
+			var industry_list=document.getElementById('belong_industry');
+			var ways_content = template("ways-list", data);
+			var industry_content = template("industry-list", data);
+			ways_list.innerHTML = ways_content;
+			industry_list.innerHTML = industry_content;
+		},
+		error:function(){
+			mui.toast('获取数据失败！');
+		},
+	});
+	
+	
+	//选择投放起始时间、结束时间
+	(function($) {
+		$.init();
+		//选择投放起始时间
+		var put_time_start=document.getElementById('put_time_start');
+		put_time_start.addEventListener('tap',function(){
+			var optionsJson = this.getAttribute('data-options');
+			var options = JSON.parse(optionsJson);
+			var picker = new $.DtPicker(options);
+			picker.show(function(rs) {	
+				put_time_start.value=rs.text;
+				picker.dispose();
+			});
+		}, false);
+		
+		//选择投放结束时间
+		var put_time_end=document.getElementById('put_time_end');
+		put_time_end.addEventListener('tap',function(){
+			var optionsJson = this.getAttribute('data-options');
+			var options = JSON.parse(optionsJson);
+			var picker = new $.DtPicker(options);
+			picker.show(function(rs) {	
+				put_time_end.value=rs.text;		
+				picker.dispose();
+			});
+		}, false);
+	})(mui);
+	//点击提交
+	document.getElementById('qd').addEventListener('tap',function(){
+	
+		var product_name=document.querySelector('input[name="product_name"]').value;
+		var belong_industry=document.getElementById('industry').value;
+		var put_time_start=document.querySelector('input[name="put_time_start"]').value;
+		var put_time_end=document.querySelector('input[name="put_time_end"]').value;
+		var put_information=document.querySelector('input[name="put_information"]').value;
+		var put_budget=document.querySelector('input[name="put_budget"]').value;
+		var customer_name=document.querySelector('input[name="customer_name"]').value;
+		var media_ways=document.getElementById('ways').value;
+		if(!product_name||!belong_industry||!media_ways||!put_time_start||!put_time_end||!put_information){
+			mui.toast("您填写的信息不能为空！");
+			return;
+		};
+		if(belong_industry=="请选择"||media_ways=="请选择"){
+			mui.toast("您未选择所属行业或媒体形式！");
+			return;
+		};
+		var month=new Date().getMonth()+1;
+		var data=new Date().getDate();
+		if(month<10){
+			month='0'+month;
+		}
+		if(data<10){
+			data='0'+data;
+		}
+		var time=new Date().getFullYear()+'-'+month+'-'+data;
+		
+		if(put_time_start>=put_time_end||put_time_start<time){
+			mui.toast("您选择的投放时间不合理！");
+			return;
+		};
+		mui.ajax({
+			url:path+'/app/report/addreport',
+			type:'post',
+			dataType:'json',
+			data:{
+				'media_id': media_id,
+				'user_id':user_id,
+				'product_name':product_name,
+				'belong_industry':belong_industry,
+				'put_time_start':put_time_start,
+				'put_time_end':put_time_end,
+				'put_information':put_information,
+				'put_budget':put_budget,
+				'customer_name':customer_name,
+				'media_ways':media_ways
+			},
+			success:function(e){
+				var err=e.errmsg;
+				if(!err){
+					mui.toast("媒体报备成功！")
+					mui.later(function(){
+						mui.back();
+					},2000);
+				}else{
+					mui.toast(err);
+				};
+			},
+		});
+	});
+	//取消，返回上一页
+	document.getElementById('qx').addEventListener('tap',function(){
+		mui.back();
+	})
+</script>	
+</body>
+</html>

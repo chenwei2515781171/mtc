@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>我的投放</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+    <style>
+    	.media_collect p{width: 100%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; }
+    	.media_collect{position: relative;}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">我的投放</h1>
+	</header>
+	<div class='media' id="media" ></div>
+	<p id="dj" class="dj" style="clear:both;width:90%;height:40px;text-align:center;background-color: #0a9d28;line-height: 40px;color:#ffffff;font-size:17px;margin:0 auto;border-radius:2px">增加</p>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--JS模板-->
+<script type="text/html" id="media-list">
+	{{each Result as value i}}
+		<div class="media_collect" id='{{value.media_id}}' >
+			<img src="{{value.media_img}}" />
+			<p>{{value.media_name}}</p>
+			<!--{{if value.avatar }}
+				<div style="position:absolute;bottom:2px;right:0px;width:1.2rem;height:1.2rem">
+					<img src="{{value.avatar}}" style="width:100%"/>
+				</div>
+			{{/if}}-->
+		</div>
+	{{/each}}
+</script>
+<script type="text/javascript">
+	mui.init();
+	var user_id=localStorage.getItem('user_id');
+	mui.ajax({
+		url:path+'/app/puton/putonlist',
+		type:'post',
+		dataType:'json',
+		data:{
+			'use_id':user_id,
+		},
+		success:function(data){
+			var err=data.errmsg;
+			if(!err){
+				var media_list = document.getElementById("media");
+				var content = template("media-list", data);
+				media_list.innerHTML = content;
+				
+			}else{
+				mui.toast(err);
+			};
+			more_data();
+			goto_media_detail();
+		},
+	});
+	//遍历媒体节点，添加点击事件
+	function goto_media_detail(){
+		var list_id=document.getElementsByClassName('media_collect');
+		var adver_id='';
+		for(var i=0;i<list_id.length;i++){
+			list_id[i].addEventListener('tap',function(){
+				adver_id=this.getAttribute("id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				mui.ajax({
+					url:path+'/app/puton/putonspbut',
+					type:'post',
+					dataType:'json',
+					data:{
+						'media_id':adver_id
+					},
+					success:function(data){
+						var err=data.errmsg;
+						if(!err){
+							mui.openWindow({
+								url: "video_img.html",
+								waiting: {
+									autoShow: false
+								},
+								extras: {
+									media_id: adver_id
+								}
+							});
+						}else{
+							mui.toast(err);
+						};	
+					}	
+				});
+				
+			});
+		}
+	}
+	//点击增加
+	function more_data(){
+		document.getElementById('dj').addEventListener('tap',function(){
+			var btnArray=['取消','确定'];
+			mui.prompt("","请输入5位随机数","图片视频验证码",btnArray,function(e){  
+				if(e.index==0){
+							
+				}else {
+					var rand=e.value;
+					mui.ajax({
+						url:path+'/app/puton/putonsp',
+						type:'post',
+						dataType:'json',
+						data:{
+							'rand':rand,
+							'use_id':user_id,
+						},
+						success:function(data){
+							var err=data.errmsg;
+							if(!err){
+								var media_list = document.getElementById("media");
+								var div=document.createElement('div');
+								div.className='media_collect';
+								div.id=data.media_id;
+								var img=data.media_img;
+								var name=data.media_name;
+//								var avatar=data.avatar;
+//								if(avatar){
+//									div.innerHTML='<img src="'+img+'"/><p>'+name+'</p><div style="position:absolute;bottom:2px;right:0px;width:1.2rem;height:1.2rem"><img src="'+avatar+'" style="width:100%"/></div>';
+//								}else{
+									div.innerHTML='<img src="'+img+'"/><p>'+name+'</p>';
+//								}
+								media_list.appendChild(div);
+								
+								
+							}else{
+								mui.toast(err);
+							};	
+							goto_media_detail()
+						}	
+					})
+				}
+			},'div')
+		});
+	}
+</script>	
+</body>
+</html>

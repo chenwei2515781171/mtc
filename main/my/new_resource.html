@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>我有新资源</title>
+    <link href="../../css/mui.picker.css" rel="stylesheet" />
+	<link href="../../css/mui.poppicker.css" rel="stylesheet" />
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link  href="../../css/my.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../css/mui.picker.min.css" />
+	<link rel="stylesheet" href="../../css/report.css" />
+    <style>
+    	#middlePopover .import{margin-bottom:0px;}
+    	.media_ways select{height:40px;font-size:1rem;border:1px solid rgba(0,0,0,.2) !important;padding:5px 10px}
+    	#tj{margin-bottom:30px;margin-top:10px}
+    	input[type=text]{padding:5px 10px}
+    	#picture,#picture1{width: 93%;}
+    	.tk p{text-align:left;font-size:1rem}
+    	span{color:#000000}
+    	.danwei option,.danwei1 option{font-size:1rem}
+    	.city1{font-size:1rem}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">我有新资源</h1>
+	</header>
+	<div class="content">
+		<a href="#picture" id="1" class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined st"  data-id='1'>
+			<img id="pic" src="../../images/my/add.png" />
+			<p >实景图片<span>*</span></p>
+		</a>
+		<a href="#picture1" id="2" class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined st" data-id='2'>
+			<img id="picd" src="../../images/my/add.png" />
+			<p >地理位置图片<span>*</span></p>
+		</a>
+		<div id="picture" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#" onclick="appendByCamera()">手机拍照</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a href="#" onclick="appendByGallery()">相册选取</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#picture"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+		<p class="jj" id="jj">
+			<a class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined" style="padding: 10px 20px;">媒体简介<span>*</span></a>
+		</p>
+		
+		<div class="tk mui-hidden" id="tk">
+			<p>媒体名称<span>*</span></p>
+			<input name="media_name" id="media_name" class="import"  type="text" />
+			<p>所在城市<span>*</span>(生成媒体唯一标识)</p>
+			<input name="ss" class="city1" id='showCityPicker3'  value="请选择城市" type="text" />
+			<p>媒体位置<span>*</span>(请填写详细街道)</p>
+			<input name="media_position" id="phonemunber" class="import"  type="text" />
+			<p>媒体形式<span>*</span></p>
+			<div class='media_ways' id="media_ways"></div>
+			<p>媒体规格<span>*</span></p>
+			<div style="margin-bottom:15px">
+				宽：<input type="text" name="width" class="import" style="width:50px;margin-bottom: 5px;";>米&nbsp;x&nbsp;高：<input type="text" name="height" class="import" style="width:50px;margin-bottom: 5px;";>米&nbsp;
+				<div>
+				<label>单面</label>
+				<input name="mian" type="radio" value='单面' checked>
+				<label>双面</label>
+				<input name="mian" type="radio" value='双面' >
+				<label>三面</label>
+				<input name="mian" type="radio" value='三面' >
+				<label>四面</label>
+				<input name="mian" type="radio" value='四面' >
+				</div>
+			</div>   
+			<!--<input name="media_specification" id="phonemunber" class="import"  type="text" />-->
+			<p>亮灯时间<span>*</span></p>
+			<div class="put_time">
+				<span>起:</span>
+				<input id="put_time_start" data-options='{"type":"time"}' name="put_time_start" type="text" value="请选择" />
+				<span>至:</span>
+				<input id="put_time_end" data-options='{"type":"time"}' name="put_time_end" type="text" value="请选择" />
+			</div>
+			
+			<!--<input name="right_time" id="phonemunber" class="import"  type="text" />-->
+			<p>人车流量<span>*</span></p>
+			<input name="people_flow" id="phonemunber" class="import" style="width:30%;" type="text" />万人次/日
+			<!--<select  id='danwei' name="danwei" style="width:60px;height:40px;font-size:17px">
+					<option value="年">年</option>
+					<option value="月">月</option>
+					<option value="周">周</option>
+			</select> -->
+			<p>刊例价<span>*</span></p>
+			<input name="rate_card" id="phonemunber" class="import"  type="text" style="width:30%;"  />万/
+			<select  id='danwei1' name="danwei1" style="width:60px;height:40px;font-size:17px">
+					<option value="年">年</option>
+					<option value="月">月</option>
+					<option value="周">周</option>
+			</select> 
+			<p>详细信息（如此媒体位于天河北路段......）<span>*</span></p>
+			<input name="media_detail" id="phonemunber" class="import"  type="text" />
+			
+			<!--<div class="lz">
+				<p class="log" id="qd"><a href="#middlePopover">确定</a></p>
+				<p class="log" id="qx"><a href="#middlePopover">取消</a></p>
+			</div>-->
+			<input name="qr" type="button" id="qr" class="import loginaction" value="提交媒体信息" style="width:100%;font-size:1.1rem;background-color: #0a9d28;color:#ffffff"/>
+		</div>
+		<a href="#picture1" id="3" class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined st bt"  data-id='3'>
+			<img id="pic3" src="../../images/my/add.png" />
+			<p >广告证</p>
+		</a>
+		<a href="#picture1" id="4" class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined st bt" data-id='4'>
+			<img id="pic4" src="../../images/my/add.png" />
+			<p >场地证</p>
+		</a>
+		<div id="picture1" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#" onclick="appendByCamera1()">手机拍照</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a href="#" onclick="appendByGallery1()">相册选取</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#picture1"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+		<p style="margin-top:15px">媒体所属公司</p>
+		<input name="media_company" id="phonemunber" class="import"  type="text" />
+		<p class="log" id="tj" onclick="upload()">提交</p>
+	</div>
+
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/immersed.js" ></script>
+<script type="text/javascript" src="../../js/template.js" ></script>
+
+<script src="../../js/mui.picker.js"></script>
+<script src="../../js/mui.poppicker.js"></script>
+<script src="../../js/city.data.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/city.data-3.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/mui.picker.min.js"></script>
+ <script type="text/javascript" src="../../js/caijian/js/jquery-1.11.2.min.js" ></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--媒体形式列表模板-->
+<script type="text/html" id='ways-list'>
+	<select  id='ways' name="ways" onchange="gradeChange()">
+		<option  value="请选择">请选择</option>
+		{{each Result_ways as value  i}}
+			<option value="{{value.media_ways_name}}">{{value.media_ways_name}}</option>
+		{{/each}}
+	</select> 
+</script>
+<script type="text/javascript">
+
+		//选择搜索城市
+	var belong_city;
+	(function($, doc) {
+		$.init();
+		$.ready(function() {
+		/**
+		* 获取对象属性的值
+		* 主要用于过滤三级联动中，可能出现的最低级的数据不存在的情况，实际开发中需要注意这一点；
+		* @param {Object} obj 对象
+		* @param {String} param 属性名
+		*/
+			var _getParam = function(obj, param) {
+				return obj[param] || '';
+			};
+					
+		//级联示例
+			var cityPicker3 = new $.PopPicker({
+					layer: 3
+			});
+			cityPicker3.setData(cityData3);
+			var showCityPickerButton = doc.getElementById('showCityPicker3');
+			showCityPickerButton.addEventListener('tap', function(event) {
+				cityPicker3.show(function(items) {
+					showCityPickerButton.value= _getParam(items[0], 'text') +_getParam(items[1], 'text') +_getParam(items[2], 'text');
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+					belong_city=_getParam(items[1], 'text');
+				});			
+			}, false);
+		});
+	})(mui, document);
+	
+	var user_id= localStorage.getItem('user_id');
+	//获取媒体形式列表 
+	mui.ajax({
+		url:path+'/app/camera/usermedialist',
+		type:'post',
+		dataType:'json',
+		data:{
+			'user_id':user_id
+		},
+		success:function(data){
+			var err=data.errmsg;
+			if(!err){
+				var ways_list=document.getElementById('media_ways');
+				var ways_content = template("ways-list", data);
+				ways_list.innerHTML = ways_content;
+				
+			}else{
+				mui.toast(err);
+			};
+		},
+	});
+	
+		//选择起始时间、结束时间
+	(function($) {
+		$.init();
+		//选择投放起始时间
+		var put_time_start=document.getElementById('put_time_start');
+		put_time_start.addEventListener('tap',function(){
+			var optionsJson = this.getAttribute('data-options');
+			var options = JSON.parse(optionsJson);
+			var picker = new $.DtPicker(options);
+			picker.show(function(rs) {	
+				put_time_start.value=rs.text;
+				picker.dispose();
+			});
+		}, false);
+		//选择投放结束时间
+		var put_time_end=document.getElementById('put_time_end');
+		put_time_end.addEventListener('tap',function(){
+			var optionsJson = this.getAttribute('data-options');
+			var options = JSON.parse(optionsJson);
+			var picker = new $.DtPicker(options);
+			picker.show(function(rs) {	
+				put_time_end.value=rs.text;		
+				picker.dispose();
+			});
+		}, false);
+	})(mui);
+	//显示媒体简介
+	document.getElementById('jj').addEventListener('tap',function(){
+		document.getElementById('tk').classList.remove("mui-hidden");
+		document.getElementById('tj').classList.add("mui-hidden");
+	});
+	document.getElementById('qr').addEventListener('tap',function(){
+		document.getElementById('tk').classList.add("mui-hidden");
+		mui.later(function(){
+			document.getElementById('tj').classList.remove("mui-hidden");			
+		},2000);
+	});
+	//提交
+	var server=path+"/app/newresource/newresource";
+	var files=[];
+	
+	//定义PC为了更换缩略图
+	var pc="";
+	document.getElementById('1').addEventListener('tap', function(){
+	   var c=document.getElementById('1');
+	   pc=c.getAttribute('data-id');
+	});
+	document.getElementById('2').addEventListener('tap', function(){
+	   var c=document.getElementById('2');
+	   pc=c.getAttribute('data-id');
+	});
+	document.getElementById('3').addEventListener('tap', function(){
+	   var c=document.getElementById('3');
+	   pc=c.getAttribute('data-id');
+	});
+	document.getElementById('4').addEventListener('tap', function(){
+	   var c=document.getElementById('4');
+	   pc=c.getAttribute('data-id');
+	});
+	// 拍照添加文件
+	function appendByCamera(){
+		plus.camera.getCamera().captureImage(function(e){
+			var path;
+			plus.io.resolveLocalFileSystemURL(e, function(entry) {
+				mui.openWindow({
+                    url: 'jt.html',
+                    id: 'jt.html',
+                    extras: {
+                        path: "file:///" + entry.fullPath,
+                        change: "cem"
+                    }
+              });                    
+            }, function(e) {
+                mui.toast("读取拍照文件错误：" + e.message);
+            });
+
+		});	
+		$('.mui-backdrop-action.mui-backdrop').css('display','none');
+	   	$('.mui-backdrop').css('display','none');
+		$('#picture').css('display','none');
+		$('#picture1').css('display','none');
+	}
+		// 拍照添加文件
+	function appendByCamera1(){
+		plus.camera.getCamera().captureImage(function(e){
+			var path;
+			plus.io.resolveLocalFileSystemURL(e, function(entry) {
+				mui.openWindow({
+                    url: 'jt1.html',
+                    id: 'jt1.html',
+                    extras: {
+                        path: "file:///" + entry.fullPath,
+                        change: "cem"
+                    }
+              });                    
+            }, function(e) {
+                mui.toast("读取拍照文件错误：" + e.message);
+            });
+
+		});	
+		$('.mui-backdrop-action.mui-backdrop').css('display','none');
+	   	$('.mui-backdrop').css('display','none');
+		$('#picture').css('display','none');
+		$('#picture1').css('display','none');
+	}
+	window.addEventListener('newsId',function(event){
+        var urlPath = event.detail.urlPath;
+		appendFile(urlPath);
+		if(pc==='1'){
+			pic.src=urlPath;
+		};
+		if(pc==='2'){
+			picd.src=urlPath;
+		};
+		if(pc==='3'){
+			pic3.src=urlPath;
+		};
+		if(pc==='4'){
+			pic4.src=urlPath;
+		};    
+    });
+	
+	// 从相册添加文件
+	function appendByGallery(){
+		plus.gallery.pick(function(p){
+			mui.openWindow({
+                url: 'jt.html',
+                id: 'jt.html',
+                extras: {
+                    path: p,
+                    change: "open"
+                }
+            }, function(error) {
+                mui.toast("打开相册失败");
+            });
+	    });
+	   
+	   	$('.mui-backdrop-action.mui-backdrop').css('display','none');
+	   	$('.mui-backdrop').css('display','none');
+		$('#picture').css('display','none');
+		$('#picture1').css('display','none');
+	}
+		// 从相册添加文件
+	function appendByGallery1(){
+		plus.gallery.pick(function(p){
+			mui.openWindow({
+                url: 'jt1.html',
+                id: 'jt1.html',
+                extras: {
+                    path: p,
+                    change: "open"
+                }
+            }, function(error) {
+                mui.toast("打开相册失败");
+            });
+	    });
+	   
+	   	$('.mui-backdrop-action.mui-backdrop').css('display','none');
+	   	$('.mui-backdrop').css('display','none');
+		$('#picture').css('display','none');
+		$('#picture1').css('display','none');
+	}
+	// 添加文件
+	
+	function appendFile(p){
+		if(pc==='1'){
+			files.push({name:"img_live",path:p});
+		};
+		if(pc==='2'){
+			files.push({name:"img_location",path:p});
+		};
+		if(pc==='3'){
+			files.push({name:"img_adver_card",path:p});
+		};
+		if(pc==='4'){
+			files.push({name:"img_plan_card",path:p});
+		};
+		
+	}
+	// 上传文件
+	function upload(){
+		var name=document.querySelector('input[name="media_name"]').value;
+		var location=belong_city+document.querySelector('input[name="media_position"]').value;
+		var style=document.getElementById('ways').value;
+		var city=belong_city;
+		var size=document.querySelector('input[name="width"]').value+"米x"+document.querySelector('input[name="height"]').value+"米"+document.querySelector('[name="mian"]:checked').value;
+		var lighting_time=document.querySelector('input[name="put_time_start"]').value+"-"+document.querySelector('input[name="put_time_end"]').value;
+		var flow=document.querySelector('input[name="people_flow"]').value+"万人次/日";
+		var price=document.querySelector('input[name="rate_card"]').value+"万/"+document.getElementById('danwei1').value;;
+		var data=document.querySelector('input[name="media_detail"]').value;
+		var media_company=document.querySelector('input[name="media_company"]').value;
+		if(!name||!location||!style||!city||!size||!lighting_time||!flow||!price||!data){
+			mui.toast("您填写的信息不能为空！");
+			return;
+		}
+		if(files.length<=0){
+			plus.nativeUI.alert("没有添加上传文件！");
+			return;
+		};
+		var task=plus.uploader.createUpload(server,
+			{method:"POST"},
+			function(t,status){ //上传完成
+				if(status==200){
+					mui.toast("上传成功，现在进行人工审核！");
+					mui.later(function(){
+						mui.openWindow('../index.html','main');
+					},3000);
+					setTimeout(function(){
+					    plus.webview.currentWebview().close();
+					}, 2000)
+				}else{
+					mui.toast("上传失败！");
+				}
+			}
+		);
+		task.addData("user_id",user_id);
+		task.addData("name",name);
+		task.addData("city",city);
+		task.addData("location",location);
+		task.addData("style",style);
+		task.addData("size",size);
+		task.addData("lighting_time",lighting_time);
+		task.addData("flow",flow);
+		task.addData("price",price);
+		task.addData("data",data);
+		task.addData("media_company",media_company);
+		for(var i=0;i<files.length;i++){
+			var f=files[i];
+			task.addFile(f.path,{key:f.name});
+		};
+		task.start();
+	}; 
+	function gradeChange(){
+		 var objS = document.getElementById("ways");
+        var grade = objS.options[objS.selectedIndex].value;
+		if(grade=="LED"){
+			mui.toast("系统默认：播放时长15秒；播放频次：60次/天!");
+		}
+	}
+</script>	
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>登录</title>
+    <script src="../js/mui.min.js"></script>
+    <script type="text/javascript" src="../js/md5.js" ></script>
+    <link rel="stylesheet" href="../css/Hui.css" />
+    <link href="../css/login.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/login1.css" />
+    <style>
+    	html{width:100%;height:100%;margin:0}
+    	body{background-image: url(../images/login/bg.jpg);background-position: bottom;background-size:85%;background-repeat: no-repeat;width:100%;min-height:100%;margin:0}
+   		.log-te{color:#0a9d28;float:left;margin-left:15px;line-height:2.6rem}
+   		.login-left{float:left}
+   		.login-right{float:right}
+    </style>
+</head>
+	<body>  
+		<div class="logo animated fadeInDown">
+			<img src="../images/login/logo.png"  />
+		</div>
+		<!--登录表单-->
+		<form class="log-text animated fadeInUp">
+			<div class="phone_num">
+				<span class="H-iconfont H-icon-phone log-te" ></span>
+				<input name="phone_num" id="phone_num" class="import style " placeholder="请输入手机号" type="text" />
+			</div>
+			<div class="phone_password">
+				<span class="H-iconfont H-icon-lock log-te" ></span>
+				<input name="password" id="password" class="import style" placeholder="请输入密码"  type="password"  />
+			</div>
+			<div class="yz">
+				<input name="yzm" id="yzm" class="import" type="text" placeholder="请输入验证码">
+				<input type="button" id="hq" class="import" value="获取验证码" />
+			</div>
+		</form>
+		<!--登录按钮-->
+		<div class="login animated fadeInUp">
+			<input name="login" type="button" id="login" class="import loginaction login_buttom" value="登录" />
+			<p><a class="login-left" href="register.html" >注册</a><a class="login-right" href="forget_password.html" >忘记密码</a></p>
+		</div>
+		<script type="text/javascript" src="../js/base64.js" ></script>
+		<script type="text/javascript" src="../js/url.js"></script> 
+		<script type="text/javascript">
+			mui.init();  
+			//判断是否曾经登录过，存有sessionkey
+			var loginkey=localStorage.getItem('sessionkey');
+  			if(loginkey){
+  				var user_id= localStorage.getItem('user_id');
+  				mui.ajax({
+	                url:path+'/app/public/getifdel',
+	                type:'post',
+	                dataType:'json',
+	                data:{
+						'user_id':user_id
+					},
+					success:function(data){
+						if(data.code=="1"){
+							mui.toast('用户不存在！');
+							localStorage.clear(); 
+							return;
+						}else{
+							mui.later(function(){
+								mui.openWindow('../main/index.html','main');
+							},1000);
+						};
+					},
+	            });
+  				
+  			};
+			//登录
+			var num='';
+			var clock = '';
+			var nums = 120;
+			//随机生成4位数的验证码,发送短信，倒计时防刷新.
+			document.getElementById('hq').addEventListener('tap',function(){
+				//获取手机号
+				var phone_num=document.querySelector('input[name="phone_num"]').value;
+				if(!phone_num){
+					mui.toast('请输入手机号！');
+					return;
+				};
+				//初步验证手机号是否符合
+				var reg=/^1(3[0-9]|4[5-7]|5[0-35-9]|7[0135678]|8[0-9])\d{8}$/;
+				if(!reg.test(phone_num)) {
+					mui.toast("你输入的手机号无效！");
+					return;
+				}; 
+				//生成验证码并发送到后台并返回状态
+				var number="";
+				for(var i=0;i<4;i++){  
+	    			number+=Math.floor(Math.random()*9+1); 
+				};
+				num=number;
+				hq.disabled = true;
+	            hq.value = '重新发送' + nums + 's';
+	            hq.style.color = '#0a9d28'; 
+	            mui.ajax({
+	                url:path+'/app/public/getverrifycode',
+	                type:'post',
+	                dataType:'json',
+	                data:{
+						'phone_num':phone_num,
+						'verifyCode':num
+					},
+					success:function(data){
+						var err=data.errmsg;
+						if(!err){
+							mui.toast('验证码已发送！');
+						}else{
+							mui.toast(err);
+						};
+					},
+	            });
+	               clock = setInterval(doLoop, 1000);
+			});
+			//倒计时防刷新发送验证码 
+			function doLoop() {
+				nums--;
+				if(nums > 0) {
+				    hq.value = '重新发送' + nums + 's';
+				} else {
+				    clearInterval(clock); //清除js定时器
+				    num="";//清除验证码
+				    hq.disabled = false;
+				    hq.value = '获取验证码';
+				    hq.style.color = '#0a9d28';
+				    nums = 120; //重置时间
+				}
+			};
+			//登录操作
+			document.getElementById("login").addEventListener('tap',function(){
+				//获取手机号、密码、验证码
+				var phone_num=document.querySelector('input[name="phone_num"]').value;
+				var password=document.querySelector('input[name="password"]').value;
+				var yzm=document.querySelector('input[name="yzm"]').value;
+				//判断手机号是否为空				
+				if(!phone_num){
+					mui.toast('请输入手机号！');
+					return;
+				};
+				//判断验证码是否为空
+				if(!yzm){
+					mui.toast('您输入的验证码为空！');
+					return;
+				};
+				//判断验证码是否正确
+				if(yzm!=num){
+					mui.toast("您输入的验证码不正确，请重新输入！");
+					return;
+				};
+				//判断密码是否为空
+				if (!password) {
+					mui.toast('密码不能为空！');
+					return;
+				};
+				//对密码进行md5加密
+				var jm_password='mtc'+hexMD5(password);
+				//发送数据登录操作
+				mui.ajax({
+					url:path+'/app/public/loginin',
+					type:'post',
+					dataType: "json",
+					data:{
+						'phone_num':phone_num,
+						'password':jm_password
+					},
+					success:function(data){
+						var err=data.errmsg;
+						if(!err){
+							localStorage.setItem('sessionkey',data.sessionkey);
+							localStorage.setItem('user_id',data.user_id);
+							localStorage.setItem('type',data.type);
+							localStorage.setItem('phone_num',data.phone_num);
+							localStorage.setItem('user_name',data.user_name);
+							localStorage.setItem('avatar',data.avatar);
+							mui.toast('登录成功！')
+							mui.later(function(){
+								mui.openWindow('../main/index.html','main');
+							},2000);	
+						}else{
+							mui.toast(err);
+						};
+					},
+				})
+			});
+			//获取原始窗口的高度
+			var originalHeight=document.documentElement.clientHeight || document.body.clientHeight;
+			
+			window.onresize=function(){
+			
+			    //软键盘弹起与隐藏  都会引起窗口的高度发生变化
+			    var  resizeHeight=document.documentElement.clientHeight || document.body.clientHeight;
+			
+			    if(resizeHeight*1<originalHeight*1){ 
+					document.body.style.background='url()';
+				}else{
+					document.body.style.background='url(../images/login/bg.jpg)';
+					document.body.style.backgroundPosition='bottom';
+					document.body.style.backgroundSize="85%";
+					document.body.style.backgroundRepeat="no-repeat";
+				}		     
+			}
+		</script>
+	</body>
+</html>

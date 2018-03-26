@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>视频管理</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="../../css/mui.picker.min.css" />
+	<link rel="stylesheet" href="../../css/report.css" />
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">视频管理</h1>
+	</header>
+	<div class="content">
+		<p>媒体ID<span>*</span></p>
+		<input name="media_id" id="media_id" class="import"  type="text" />
+		<p>随机数<span>*</span></p>
+		<input name="rand" id="rand" class="import"  type="text" style="height:100px;background-color:#0a9d28;width:100%;color:#ffffff;font-size:40px;text-align:center" />
+		<p>投放时间<span>*</span></p>
+		<div class="put_time">
+			<span style="color:#0a9d28">起:</span>
+			<input id="put_time_start" data-options='{"type":"date"}' name="put_time_start" type="text" value="请选择" />
+			<span style="color:#0a9d28">至:</span>
+			<input id="put_time_end" data-options='{"type":"date"}' name="put_time_end" type="text" value="请选择" />
+		</div>
+		<p style="margin-top:20px;margin-bottom:40px;color:red">注释：随机数用于我的投放栏目，请谨慎使用该媒体视频随机数，防止泄露！</p>
+		<div class="lz">
+			<p class="log" id="qd">提交</p>
+			<p class="log" id="qx">取消</p>
+		</div>
+	</div>
+<script src="../../js/mui.min.js"></script>
+<script type="text/javascript" src="../../js/template.js" ></script>
+<script src="../../js/mui.picker.min.js"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<script type="text/javascript">
+	mui.init();
+	var user_id=localStorage.getItem('user_id');
+	var media_id;
+		//返回媒体显示媒体
+	mui.plusReady(function(){
+		var id= plus.webview.currentWebview();
+		media_id=id.media_id;
+		document.getElementById("media_id").value =media_id;
+		mui.ajax({
+			url:path+'/app/media/sp',
+			type:'post',
+			dataType:'json',
+			data:{
+				'media_id': media_id
+			},
+			success:function(e){
+				var info=e.data;
+				if(info){
+					document.getElementById("rand").value =info.rand;
+					document.getElementById("put_time_end").value =info.put_time_end;
+					document.getElementById("put_time_start").value =info.put_time_start;
+				}else{
+					document.getElementById("rand").value =randomWord(false,4)+media_id;
+				}
+			},
+		});
+	});
+	
+	//选择投放起始时间、结束时间
+	(function($) {
+		$.init();
+		//选择投放起始时间
+		var put_time_start=document.getElementById('put_time_start');
+		put_time_start.addEventListener('tap',function(){
+			var optionsJson = this.getAttribute('data-options');
+			var options = JSON.parse(optionsJson);
+			var picker = new $.DtPicker(options);
+			picker.show(function(rs) {	
+				put_time_start.value=rs.text;
+				picker.dispose();
+			});
+		}, false);
+		//选择投放结束时间
+		var put_time_end=document.getElementById('put_time_end');
+		put_time_end.addEventListener('tap',function(){
+			var optionsJson = this.getAttribute('data-options');
+			var options = JSON.parse(optionsJson);
+			var picker = new $.DtPicker(options);
+			picker.show(function(rs) {	
+				put_time_end.value=rs.text;		
+				picker.dispose();
+			});
+		}, false);
+	})(mui);
+	//点击提交
+	document.getElementById('qd').addEventListener('tap',function(){
+		var put_time_end=document.querySelector('input[name="put_time_end"]').value;
+		var put_time_start=document.querySelector('input[name="put_time_start"]').value;
+		var rand=document.querySelector('input[name="rand"]').value;
+		if(put_time_end=="请选择"||put_time_start=="请选择"){
+			mui.toast("请选择时间！");
+			return;
+		};
+		mui.ajax({
+			url:path+'/app/media/addsp',
+			type:'post',
+			dataType:'json',
+			data:{
+				'media_id': media_id,
+				'put_time_start':put_time_start,
+				'put_time_end':put_time_end,
+				'rand':rand
+			},
+			success:function(e){
+				var err=e.errmsg;
+				if(!err){
+					mui.toast("设置成功！")
+					mui.later(function(){
+						mui.back();
+					},2000);
+				}else{
+					mui.toast(err);
+				};
+			},
+		});
+	});
+	function randomWord(randomFlag, min, max) {
+		    var str = "",
+		    range = min,
+		    arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+		      'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+		      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+		      'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+		  if (randomFlag) {
+		    range = Math.round(Math.random() * (max - min)) + min;// 任意长度
+		  }
+		  for (var i = 0; i < range; i++) {
+		    pos = Math.round(Math.random() * (arr.length - 1));
+		    str += arr[pos];
+		  }
+		  return str;
+	}
+	//取消，返回上一页
+	document.getElementById('qx').addEventListener('tap',function(){
+		mui.back();
+	})
+</script>	
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>媒体详情页</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/main.css" /> 
+    <link rel="stylesheet" href="../../css/media_detail.css" />
+    <style>
+    	#detail{margin-bottom:55px}
+    	#qd{position:fixed;bottom:0;width:100%;height:45px;text-align:center;background-color:#0a9d28}
+    	#qd span{line-height:45px;color:#ffffff;font-size:1rem;}
+    	#sx{color:#0a9d28;font-size:13px}
+    	#xq{position:fixed;top:0px;left:0;z-index:9999;width:100%;height:100%;background-color:#ffffff;padding:30px 10px 10px 15px}
+   		#xq span{margin-bottom:20px}
+   		#xq p{width:90%;margin-top:30px;height:40px;line-height:40px;text-align:center;margin-left:5%;border:1px solid #b0b0b0}
+    	.media_other{width:55%;float:left}
+    	.media_other table{width:100%;font-size:0.7rem}
+    	.media_location{width:43%;float:left;margin-left:2%;margin-bottom:1rem}
+    	.td{text-align: center;width:26%}
+    	#close1{clear:both;width:100%;height:35px;text-align:center;border:1px solid #b9b9b9;line-height: 35px;color:#b9b9b9;font-size:1rem;border-radius:2px}
+    </style>
+</head>
+<body>
+	<div class="detail" id="detail"></div>
+	<div id="qd" >
+		<span>提交至媒体报备</span>
+	</div>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--JS模板-->
+<script type="text/html" id="media-detail">
+	<header class="mui-bar mui-bar-nav head" >
+		<h1 class="mui-title">{{media_name}}</h1>
+	</header>
+	<div class="sc" id="sc">
+		<img src="../../images/my/sc.png"  />
+		<p>收藏</p>
+	</div>
+	<div class="media_img" style="margin-top:55px">
+		<img id="ad_img" src="{{media_img}}" name="ad_img" width="100px" />
+	</div>
+	<div class="media_detail">
+		<p>媒体简介：</p>
+		<span>{{media_introduction}}</span> <a id="sx" >【详情】</a> 
+	</div>
+	<div id="xq" class="xq mui-hidden">
+		<span>{{media_introduction}}</span> 
+		<p  id='close'>关闭</p>
+	</div>
+	<div class="media_other" >
+		<table cellpadding="10" >
+			<tr>
+				<td class="td" valign="top">位置：</td>
+				<td>{{location}}</td>
+			</tr>
+			<tr>
+				<td class="td" valign="top">形式：</td>
+				<td>{{style}}</td>
+			</tr>
+			<tr>
+				<td class="td" valign="top">规格：</td>
+				<td>{{size}}</td>
+			</tr>
+			<tr>
+				<td class="td" valign="top">亮灯：</td>
+				<td>{{lighting_time}}</td>
+			</tr>
+			<tr>
+				<td class="td" valign="top">流量：</td>
+				<td>{{flow}}</td>
+			</tr>
+			<tr>
+				<td class="td" valign="top">刊例价：</td>
+				<td>{{price}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="media_location">
+		<img id="ad_img" src="{{media_localtion_img}}" width="100%" />
+	</div>
+	<p id="close1" >关闭</p>
+</script>
+<script type="text/javascript">
+    //获取用户ID
+    var user_id=localStorage.getItem('user_id');
+    //获取媒体数据
+	mui.plusReady(function(){
+		var id = plus.webview.currentWebview();
+		var media_id = id.media_id;
+		mui.ajax({
+			url:path+'/app/adboard/getdetails',
+			type:'post',
+			dataType:'json',
+			data:{
+				'media_id':media_id,
+				'user_id':user_id
+			},
+			success:function(data){
+				var err=data.errmsg;
+				if(!err){
+					var media_detail = document.getElementById("detail");
+					var content = template("media-detail", data);
+					media_detail.innerHTML = content;
+					//收藏广告
+					document.getElementById('sc').addEventListener('tap',function(){
+						mui.ajax({
+							url:path+'/app/adboard/collect',
+							type:'post',
+							dataType:'json',
+							data:{
+								'media_id':media_id,
+								'user_id':user_id
+							},
+							success:function(t){
+								mui.toast(t.msg);
+							},
+						});
+					});
+					//下载图片
+					download();
+					document.getElementById('sx').addEventListener('tap',function(){
+				    	document.getElementById('xq').classList.remove("mui-hidden");
+				    });
+				    document.getElementById('close').addEventListener('tap',function(){
+				    	document.getElementById('xq').classList.add("mui-hidden");
+				    });
+				    document.getElementById('close1').addEventListener('tap',function(){
+				    	mui.back();
+				    });
+					//将媒体需求信息传到媒体报备
+					document.getElementById('qd').addEventListener('tap',function(){
+						mui.openWindow({
+							url: "media_map.html",
+							waiting: {
+								autoShow: false
+							},
+							extras: {
+								media_id:media_id,
+							}
+						});	
+					});
+				}else{
+					mui.toast(err);
+				};
+			},
+		});
+	
+	});
+	
+</script>	
+<script type="text/javascript" src="../../js/downloadImage.js" ></script>
+</body>
+</html>

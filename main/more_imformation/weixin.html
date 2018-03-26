@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>注册</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" href="../../css/mui.min.css" />
+		<link href="../css/login.css" rel="stylesheet" />
+		<script src="../../js/mui.min.js"></script>
+		
+				<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../../css/login.css" />
+		
+		<!--<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />-->
+		<style>
+			.mui-bar .mui-icon {padding-top:6px;color:#fff}
+		</style>
+	</head>
+	<body style="margin:0; ">
+		<header class="mui-bar mui-bar-nav head">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">微信消息</h1>
+		</header>
+	</body>
+	<script>
+		mui.init();
+		mui.plusReady(function(){
+			var a = plus.webview.currentWebview();
+			var content_url = a.url;
+			mui.openWindow(content_url);
+		});
+	</script>
+</html>

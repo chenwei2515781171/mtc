@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>我的列表</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <style>
+    	body{width:100%;background-color:#efeff4}
+    	ul{list-style: none;padding-left:0;margin-top:0}
+    	ul li{height:60px;padding-top:3px;width:100%;background-color:#fff;border-bottom:1px solid #efeff4;padding-bottom: 10px;}
+    	ul li p{float: left;padding-top:7px;height:100%;width:20%;margin-left:3%;vertical-align:middle;overflow:hidden;}
+    	ul li span{padding-top:7px;margin-left:3%;float:left;color:#000000;width:73%;font-size:15px;margin-bottom:0px;height:100%;overflow: hidden;-webkit-line-clamp: 3;display: -webkit-box;-webkit-box-orient: vertical;font-size:13px}
+    	.img{width:100%}
+    	.hr{margin-top:20px}
+    	.wgw{position:fixed;z-index:9999;bottom:5.6rem;right:0.5rem;width:50px;height:58px;background-image: url(../../images/abc.png);background-size: cover;text-align:center;line-height: 58px;}
+    	.wgw p{color:#fff;font-size:0.9rem;}
+    	.mtc{position:fixed;z-index:9999;bottom:2rem;right:0.5rem;width:50px;height:58px;background-image: url(../../images/abc.png);background-size: cover;text-align:center;line-height: 58px;}
+    	.mtc p{color:#fff;font-size:0.9rem;}
+    </style>
+</head>
+<body>
+<div class="wgw">
+	<p href="" id="wgw">微官网</p>
+</div>
+<div class="mtc">
+	<p id="mtc">媒体村</p>
+</div>
+<div id="pullrefresh" class="mui-content mui-scroll-wrapper"style="width:100%;">
+    <div class="mui-scroll" style="width:100%;">	
+		<div class="my_list" id="my_list"></div>
+	</div>
+</div>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<!--JS模板-->
+<script type="text/html" id="my-list">
+<div class="list-text">
+	<ul class="my_ul">
+		{{each item as value i}}
+			{{each value.content.news_item as val j}}
+				<li class="list_item" ><p data-type="{{val.url}}"><img class="img" src="{{ val.thumb_url}}"/></p><span>{{val.title}}</span></li>
+			{{/each}}
+		{{/each}}
+	</ul>
+</div> 
+</script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<script type="text/javascript">
+	mui.init({
+		pullRefresh: {
+			container: '#pullrefresh',
+			up: {
+				contentrefresh: '正在加载...',
+				callback: pullupRefresh
+			}
+		}
+	});
+	
+	mui.plusReady(function(){
+		document.getElementById("wgw").addEventListener("tap",function(){
+		mui.openWindow('wgw.html');
+	})
+	document.getElementById("mtc").addEventListener("tap",function(){
+		mui.openWindow('mtc.html');
+	})
+		var user_id= localStorage.getItem('user_id');
+		mui.ajax({
+			url:'http://120.78.169.119:8818/app/wechat_api/gettoken',
+			type:'get',
+			dataType:'json',
+			success:function(data){
+				var token=data.access_token;
+				if(!token){
+					mui.toast("微信令牌错误！");
+				}else{
+					mui.ajax({
+						url:'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token='+token,
+						type:'post',
+						contentType: "application/json",
+						data:{
+							"type":"news",
+							"offset":0,
+							"count":4
+						},
+						dataType:'json',
+						success:function(data){
+							var err=data.errmsg;
+							if(!err){
+								var my_list=document.getElementById('my_list');
+								var content = template("my-list", data);
+								my_list.innerHTML = content;
+								goto_list_detail();
+							}else{
+								mui.toast(err); 
+							};
+						},
+					});
+				};
+			},
+		})
+		
+	});
+	//上拉加载数据
+	var num=4;
+	function pullupRefresh() {
+		
+			var count=num+4;
+			mui.ajax({
+				url:'http://120.78.169.119:8818/app/wechat_api/gettoken',
+				type:'get',
+				dataType:'json',
+				success:function(data){
+					var token=data.access_token;
+					if(!token){
+						mui.toast("微信令牌错误！");
+					}else{
+						setTimeout(function() {
+							mui.ajax({
+								url:'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token='+token,
+								type:'post',
+								contentType: "application/json",
+								data:{
+									"type":"news",
+									"offset":0,
+									"count":count
+								},
+								dataType:'json',
+								success:function(data){
+									var err=data.errmsg;
+									if(!err){
+										var item=data.item;
+										var length=item.length;
+										if(length==num){
+											mui.toast("已经没有更多数据了！"); 
+										}else{
+											var my_ul = document.body.querySelector(".my_ul");
+											for(var i=num;i<length;i++){
+												var news_item=item[i].content.news_item;
+												for(var j=0;j<news_item.length;j++){
+													var url=news_item[j].url;
+													var thumb_url=news_item[j].thumb_url;
+													var title=news_item[j].title;
+													var li = document.createElement('li');
+													li.className = 'list_item';
+													li.innerHTML ='<p data-type="'+url+'"><img class="img" src="'+thumb_url+'"/></p><span>'+title+'</span>';
+													my_ul.appendChild(li);
+												}
+											};
+											num=length;
+											goto_list_detail();
+										};
+										
+									}else{
+										mui.toast(err); 
+									};
+								},
+							});
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh();
+						}, 2000);
+					};
+				},
+			})
+		
+	}
+	//添加点击事件
+	function goto_list_detail(){
+		var list_item=document.getElementsByClassName('list_item');
+		var url="";
+		for (var i=0;i<list_item.length;i++) {
+			list_item[i].addEventListener('tap',function(){
+				var p=this.firstChild;
+				url=p.getAttribute('data-type');
+				mui.openWindow({
+					url: "weixin.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						url: url
+					}
+			    });
+				
+			})
+		}
+	};
+</script>	
+</body>
+</html>

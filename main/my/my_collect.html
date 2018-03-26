@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>我的收藏</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/my.css" rel="stylesheet"/>
+    <style>
+    	.media_collect{
+    		position:relative
+    	}
+    	.media_collect span{
+    		position:absolute;
+    		top:0;
+    		right:3%;
+    		color:#ffffff;
+    		font-weight:bold
+    	}
+    	.mui-icon{font-size:1rem;}
+    	.media_collect{position:relative}
+    	.media_collect p{width: 100%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; }
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">我的收藏</h1>
+	</header>
+	<div class='media' id="media" style="margin-top:40px"></div>
+	<p id="dj" class="dj jz">点击加载更多数据... </p>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+<!--JS模板-->
+<script type="text/html" id="media-list">
+	{{each Result as value i}}
+		<div class="media_collect" id='{{value.media_id}}'>
+			<img src="{{value.media_img}}" class='img' />
+			<p>{{value.media_name}}</p>
+			<span class="mui-icon mui-icon-close" id='{{value.media_id}}' style="color:#0a9d28"></span>
+			{{if value.media_url_state=='1' }}
+				<img class="live_img" src="../../images/sxt.png" style="height:18px;width:25px;position:absolute;top:30px;right:2px;z-index:9;">
+			{{/if}}
+		</div>
+	{{/each}}
+</script>
+<script type="text/javascript">
+	mui.init();
+	var user_id= localStorage.getItem('user_id');
+	var pages=1;
+	mui.ajax({
+		url:path+'/app/collection/mycollection',
+		type:'post',
+		dataType:'json',
+		data:{
+			"user_id":user_id,
+			"next_pages":pages
+		},
+		success:function(data){
+			var err=data.errmsg;
+			if(!err){
+				pages=data.pages;
+				var media_list = document.getElementById("media");
+				var content = template("media-list", data);
+				media_list.innerHTML = content;
+				more_data();
+				goto_media_detail();
+				del_collect();
+			}else{
+				var no_data=document.getElementById('dj');
+				no_data.innerText="暂无数据！";
+				mui.toast(err);
+			};
+		},
+	});
+	//遍历媒体节点，添加点击事件
+	function goto_media_detail(){
+		var media_id;
+		mui('.media_collect').on('tap','.img',function(){
+				media_id=this.parentNode.getAttribute("id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				
+				mui.openWindow({
+					url: "../head/media_detail.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						media_id: media_id
+					}
+			    });
+			
+		});
+	}
+	//点击加载更多数据
+	function more_data(){
+		document.getElementById('dj').addEventListener('tap',function(){
+			var next_pages=parseInt(pages)+1;
+			mui.ajax({
+				url:path+'/app/collection/mycollection',
+				type:'post',
+				dataType:'json',
+				data:{
+					"user_id":user_id,
+					"next_pages":next_pages
+				}, 
+				success:function(data){
+					var no_data=document.getElementById('dj');
+					var err=data.errmsg;
+					if(!err){
+							pages=data.pages;
+							var media_list = document.getElementById("media");
+							for(var i=0;i<data.Result.length;i++){
+								var div=document.createElement('div');
+								div.className='media_collect';
+								div.id=data.Result[i]['media_id'];
+								var img=data.Result[i]['media_img'];
+								var name=data.Result[i]['media_name'];
+								var id=data.Result[i]['media_id'];
+								var state=data.Result[i]['media_url_state'];
+							    var a='<img src="'+img+'" class="img"/><p>'+name+'</p><span class="mui-icon mui-icon-close" id="'+id+'" style="color:#0a9d28"></span>';
+							    var c='';
+								if(state==1){
+									c='<img class="live_img" src="../../images/sxt.png" style="height:18px;width:25px;position:absolute;top:30px;right:2px;z-index:9;">';
+								};
+								div.innerHTML=a+c;
+								
+								media_list.appendChild(div);
+							};
+							goto_media_detail();
+							del_collect();
+					}else{
+						no_data.innerText="已经没有更多数据了！";
+					};
+				},
+			});
+		});
+	};
+	//取消收藏
+	function del_collect(){
+		
+		var media_id;
+		mui('.media_collect').on('tap','.mui-icon',function(){
+				media_id=this.getAttribute("id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				this.parentNode.classList.add("mui-hidden");
+				mui.ajax({
+					url:path+'/app/collection/delcollect',
+					type:'post',
+					dataType:'json',
+					data:{
+						"user_id":user_id,
+						"media_id":media_id
+					}, 
+					success:function(data){
+						var err=data.errmsg;
+						if(!err){
+								mui.toast('取消成功！');
+						}else{
+							mui.toast('取消失败！');
+						};
+					},
+				});
+				
+			});
+		
+	}
+</script>	
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../css/main.css" />
+   
+    <style>
+    	html,body{width:100%;}
+    	/*body{background-image:url('../../images/bg.png');background-size: cover;} */
+    	.img_id .live_img{height:14px;width:19px;position:absolute;top:0;right:2.5%;z-index:9;}
+    	.img_id1 .live_img{height:14px;width:19px;position:absolute;top:0;right:2.5%;z-index:9;}
+    	.gt{height:12rem;width:100%;padding:0.6rem}
+    	.html5zoo-bottom-shadow-0{display:none;!important}
+    	#html5zoo-1{width:100%;height:100%;display:block;position:relative;margin:0px auto 60px;}
+    	.cd{height:100%}
+    	.cd ul{list-style: none;width: 100%;height: 100%;margin: 0;padding: 0;}
+    	.cd ul li{width:33.333%;height: 100%;float:left;text-align: center;}
+    	.mui-content{background-color: #fff;}
+    	.img_id{width:100%}
+    	.cd p{font-size:0.6rem;color:#000000;line-height: 0.9rem;}
+    	.img_id p,.img_id1 p{font-size:0.6rem;color:#000000;line-height: 1rem;height: 1.2rem;}
+    </style>
+</head>
+<body>
+<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+	<div class="mui-scroll" >	
+<div class="gt">
+	<div style="width:100%;height:100%;overflow: hidden;">
+	    <div id="html5zoo-1" style="display:block;position:relative;margin:0px auto;">
+        
+    	</div>
+	</div>
+</div>
+<!--<div class="jj" style="margin:0 3%;border:1px solid #e1e1e1;width:94%;height:12%";>
+	<div class="jj-left" style="width:22%;margin-right:3%;text-align: center;height:100%;float: left;overflow:hidden;">
+		<span style="height:100%;display:inline-block;vertical-align: middle;"></span>
+		<img src="../../images/login/logo.png" style="width:80%;vertical-align:middle;"/>
+	</div>
+	<div class="jj-right" id="jj-right" style="width:75%;text-align: center;height:100%;float: left;overflow:hidden;">
+		
+	</div>
+</div>-->
+<div class="cd" style="width:95%;height:4.7rem;overflow:hidden;margin:0 auto";>
+	<ul style="list-style: none;">
+		<li id="cd1">
+			<img src="../../images/zmt.png" width="50" />
+			<p>寻找媒体</p>
+		</li>
+		<li id="cd2">
+			<img src="../../images/jk.png"  width="50"/>
+			<p>实时监控</p>
+		</li>
+		<li id="cd3">
+			<img src="../../images/bb.png"  width="50"/>
+			<p>媒体报备</p>
+		</li>
+	</ul>
+</div>         
+<div class='media' id="media" style="width:100%;padding:0.5rem;overflow:hidden;"></div>
+	
+		
+	
+</div>
+<!--<span id="sx" class="mui-icon mui-icon-spinner " style="position:fixed;bottom:30px;right:1rem;color:#0a9d28;font-size:1.7rem;z-index:999"></span>-->
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/template.js" type="text/javascript"   charset="utf-8"></script>
+<script type="text/javascript" src="../../js/url.js" ></script>
+
+<script src="../../js/js/jquery.js?ver=v1.6.4"></script>
+<script src="../../js/js/html5zoo.js?ver=v0.0.1"></script>
+<script src="../../js/js/lovelygallery.js?ver=v0.0.1"></script>
+
+
+<!--JS模板-->
+<script type="text/html" id="st">
+	<ul class="html5zoo-slides" style="display:none;">
+		<li><img src="{{img_1}}"  /></li>
+		<li><img src="{{img_2}}"/> </li>
+		<li><img src="{{img_3}}" /></li>
+	</ul>
+	<ul class="html5zoo-thumbnails" style="display:none;">
+		<li><img src="{{img_1}}"  /></li>
+		<li><img src="{{img_2}}"/> </li>
+		<li><img src="{{img_3}}" /></li>
+	</ul>
+	
+</script>
+<!--<script type="text/html" id="jj">
+	<img src="{{img_4}}" style="width:100%"/>
+</script>-->
+<script type="text/html" id="media-list">
+
+<div class="mui-slider" id="slider" style="width:100%;">
+	<div class="mui-slider-group mui-slider-loop" style="width:33.33%">
+				<div class="mui-slider-item mui-slider-item-duplicate" style="width:100%">
+					{{each Result as value m}}
+						{{if m==k-1 }}
+							<div class="img_id" data_id="{{value.media_id}}" style="width:100%">
+								<img src="{{value.media_img}}" width="95%"/>
+								<p class="media_title">{{value.media_name}}</p>
+								{{if value.media_url_state==1 }}
+									<img class="live_img" src="../../images/sxt.png" >
+								{{/if}}
+							</div>
+						{{/if}}
+					{{/each}}
+				</div>
+				{{each Result as value m}}
+						<div class="mui-slider-item"style="width:100%">
+							<div class="img_id" data_id="{{value.media_id}}">
+								<img src="{{value.media_img}}" width="95%"/>
+								<p class="media_title">{{value.media_name}}</p>
+								{{if value.media_url_state==1 }}
+									<img class="live_img" src="../../images/sxt.png" >
+								{{/if}}
+							</div>
+						</div>
+					{{/each}}
+				<div class="mui-slider-item mui-slider-item-duplicate" style="width:100%">
+					{{each Result as value m}}
+						{{if m==0 }}
+							<div class="img_id" data_id="{{value.media_id}}">
+								<img src="{{value.media_img}}" width="95%"/>
+								<p class="media_title">{{value.media_name}}</p>
+								{{if value.media_url_state==1 }}
+									<img class="live_img" src="../../images/sxt.png" >
+								{{/if}}
+							</div>
+						{{/if}}
+					{{/each}}
+				</div>
+			</div>
+			
+			
+	<!--<div class="mui-slider-group mui-slider-loop" style="height:100%;width:100%;">
+		<div class="mui-slider-item mui-slider-item-duplicate">
+			{{each Result as value m}}
+				{{if n<(m+1) }}
+					<div class="img_id" data_id="{{value.media_id}}">
+						<img src="{{value.media_img}}" width="80%"/>
+						<p class="media_title">{{value.media_name}}</p>
+						{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+						{{/if}}
+					</div>
+				{{/if}}
+				{{if n==Result.length && (n-3)<(m+1) }}
+					<div class="img_id" data_id="{{value.media_id}}">
+						<img src="{{value.media_img}}" width="80%"/>
+						<p class="media_title">{{value.media_name}}</p>
+						{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+						{{/if}}
+					</div>
+				{{/if}}
+			{{/each}}
+			{{ if k==1}}
+				{{each Result as value p}}
+					{{if p==(Result.length-4)}}
+						<div class="img_id" data_id="{{value.media_id}}">
+						<img src="{{value.media_img}}" width="80%"/>
+						<p class="media_title">{{value.media_name}}</p>
+						{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+						{{/if}}
+					</div>
+					{{/if}}
+					{{if p==(Result.length-3)}}
+						<div class="img_id" data_id="{{value.media_id}}">
+							<img src="{{value.media_img}}" width="80%"/>
+							<p class="media_title">{{value.media_name}}</p>
+							{{if value.media_url_state==1 }}
+								<img class="live_img" src="../../images/sxt.png" >
+							{{/if}}
+						</div>
+					{{/if}}
+				{{/each}}
+			{{/if}}
+			{{ if k==2}}
+				{{each Result as value m}}
+					{{if m==(Result.length-3)}}
+						<div class="img_id" data_id="{{value.media_id}}">
+							<img src="{{value.media_img}}" width="80%"/>
+							<p class="media_title">{{value.media_name}}</p>
+							{{if value.media_url_state==1 }}
+								<img class="live_img" src="../../images/sxt.png" >
+							{{/if}}
+						</div>
+					{{/if}}
+				{{/each}}
+			{{/if}}
+		</div>
+		
+		{{each Result as value i}}
+			{{if i%3==0  }}
+				<div class="mui-slider-item" >
+			{{/if}}
+				<div class="img_id" data_id="{{value.media_id}}">
+					<img src="{{value.media_img}}" width="80%"/>
+					<p class="media_title">{{value.media_name}}</p>
+					{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+					{{/if}}
+				</div>
+			{{if (i+1)>n && (i+1)==Result.length}}
+				
+				{{ if k==1}}
+					{{each Result as value y}}
+					{{if y==(Result.length-4)}}
+						<div class="img_id" data_id="{{value.media_id}}">
+						<img src="{{value.media_img}}" width="80%"/>
+						<p class="media_title">{{value.media_name}}</p>
+						{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+						{{/if}}
+					</div>
+					{{/if}}
+					{{if y==(Result.length-3)}}
+						<div class="img_id" data_id="{{value.media_id}}">
+							<img src="{{value.media_img}}" width="80%"/>
+							<p class="media_title">{{value.media_name}}</p>
+							{{if value.media_url_state==1 }}
+								<img class="live_img" src="../../images/sxt.png" >
+							{{/if}}
+						</div>
+					{{/if}}
+					{{/each}}
+				{{/if}}
+				{{ if k==2}}
+					{{each Result as value y}}
+					{{if y==(Result.length-4)}}
+						<div class="img_id" data_id="{{value.media_id}}">
+						<img src="{{value.media_img}}" width="80%"/>
+						<p class="media_title">{{value.media_name}}</p>
+						{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+						{{/if}}
+					</div>
+					{{/if}}
+					
+					{{/each}}
+				{{/if}}
+			{{/if}}
+			{{if (i+1)%3==0 || Result.length==(i+1)}}
+				</div>
+			{{/if}}
+		{{/each}}
+	    <div class="mui-slider-item mui-slider-item-duplicate">
+	    		{{each Result as value j}}
+				{{if j<3 }}
+					<div class="img_id" data_id="{{value.media_id}}">
+						<img src="{{value.media_img}}" width="80%"/>
+						<p class="media_title">{{value.media_name}}</p>
+						{{if value.media_url_state==1 }}
+							<img class="live_img" src="../../images/sxt.png" >
+						{{/if}}
+					</div>
+				{{/if}}
+			{{/each}}
+	    </div>
+	</div>-->
+	
+</div>
+<div style="width:100%;">
+	{{each Result1 as value n}}
+		<div class="img_id1" data_id="{{value.media_id}}">
+			<img src="{{value.media_img}}" width="95%"/>
+			<p class="media_title">{{value.media_name}}</p>
+			{{if value.media_url_state==1 }}
+				<img class="live_img" src="../../images/sxt.png" >
+			{{/if}}
+		</div>
+	{{/each}}
+</div>
+</script>
+<script type="text/javascript">
+	mui.plusReady(function(){
+    	plus.nativeUI.closeWaiting();//这里监听页面是否加载完毕，完成后关闭等待框
+    	
+	});  
+	mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						contentrefresh: '正在刷新...',
+						callback: pulldownRefresh
+					}
+				}
+			});
+	
+	/**
+	 * 下拉刷新具体业务实现
+	*/
+	function pulldownRefresh() {
+		setTimeout(function() {
+			window.location.reload();
+			mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+		}, 1500);
+	};
+	mui.ajax({
+		url:path+'/app/uploadimage/getmultiimageurl',
+		type:'get',
+		dataType:'json',
+		async:false,
+		data:{},
+		success:function(data){
+			var err=data.errmsg;
+			if(!err){	
+				var html5zoo = document.getElementById("html5zoo-1");
+				var content = template('st',data);
+				html5zoo.innerHTML = content; 
+//				var jj_right = document.getElementById("jj-right");
+//				var content1 = template('jj',data);
+//				jj_right.innerHTML = content1; 
+				
+			}else{
+				mui.toast("数据为空！");
+			};
+		},
+	});
+	mui.ajax({
+		url:path+'/app/adboard/getallMedia',
+		type:'get',
+		dataType:'json',
+		data:{},
+		success:function(data){
+			var err=data.errmsg;
+			if(!err){	
+				var media_list = document.getElementById("media");
+				var n=parseInt(data['Result'].length/3)*3;
+				var k=parseInt(data['Result'].length%3);
+				data['k']=k;
+				
+				data['n']=n;
+				var content = template('media-list',data);
+				media_list.innerHTML = content; 
+				var gallery = mui('.mui-slider');
+				gallery.slider({
+			  	interval:5000//自动轮播周期，若为0则不自动播放，默认为0；
+				});
+				goto_media_detail();
+				goto_media_detail1();
+			}else{
+				mui.toast("数据为空！");
+			};
+		},
+	});
+	//遍历媒体节点，添加点击事件
+	function goto_media_detail(){
+		var list_id=document.getElementsByClassName('img_id');
+		var media_id='';
+		for(var i=0;i<list_id.length;i++){
+			list_id[i].addEventListener('tap',function(){
+				media_id=this.getAttribute("data_id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				mui.openWindow({
+					url: "media_detail.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						media_id: media_id
+					}
+			    });
+			});
+		}
+	};
+	//遍历媒体节点，添加点击事件
+	function goto_media_detail1(){
+		var list_id=document.getElementsByClassName('img_id1');
+		var media_id='';
+		for(var i=0;i<list_id.length;i++){
+			list_id[i].addEventListener('tap',function(){
+				media_id=this.getAttribute("data_id");
+				/**
+				* 设置等待框不打开，为了调试方便；
+				* 实际项目中，可能需要打开等待框来等数据加载完毕，再展示目标页面；
+				 * http://dev.dcloud.net.cn/mui/window/#openwindow
+				*/
+				mui.openWindow({
+					url: "media_detail.html",
+					waiting: {
+						autoShow: false
+					},
+					//传递媒体的id到media_detail.html
+					extras: {
+						media_id: media_id
+					}
+			    });
+			});
+		}
+	};
+	//打开界面
+	document.getElementById("cd1").addEventListener("tap",function(){
+		mui.openWindow('../my/help_find_media.html');
+	});
+	document.getElementById("cd2").addEventListener("tap",function(){
+		mui.openWindow('../my/my_media.html');
+	});
+	document.getElementById("cd3").addEventListener("tap",function(){
+		mui.openWindow('../my/media_report.html');
+	});
+	
+</script>	
+</body>
+</html>

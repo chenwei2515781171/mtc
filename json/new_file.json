@@ -1,0 +1,22 @@
+{
+	"Result_industry":[
+	{
+	"media_industry_id":"1",
+	"media_industry_name":"电子商务"
+	},
+	{
+	"media_industry_id":"2",
+	"media_industry_name":"教育培训"
+	}
+	],
+	"Result_ways":[
+	{
+	"media_ways_id":"1",
+	"media_ways_name":"电子屏"
+	},
+	{
+	"media_ways_id":"2",
+	"media_ways_name":"墙体"
+	}
+	]
+}

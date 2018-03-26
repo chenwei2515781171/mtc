@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>首页</title>
+    <link href="../css/mui.min.css" rel="stylesheet" />
+    <link href="../css/main.css" rel="stylesheet" />
+    <style>
+    	.mui-icon img{width:24px}
+    	.mui-title{line-height:37px}
+    	.ss{float:right;color:#fff;margin-right:5px;font-size:1.3rem}
+    </style>
+</head>
+	<body>
+		<header class="mui-bar mui-bar-nav head">
+		    <h1 class="mui-title">大牌监测猫</h1>
+		    <span id="ss" class="mui-icon mui-icon-search ss" ></span>
+		</header>
+		
+		<nav class="mui-bar mui-bar-tab bottom">
+		    <a class="mui-tab-item mui-active" href="head/head.html">
+		        <span class="mui-icon "><img src="../images/tb/home.png" /></span>
+		        <span class="mui-tab-label">首页</span>
+		    </a>
+		    <a class="mui-tab-item" href="more_imformation/more_imformation.html">
+		        <span class="mui-icon "><img src="../images/tb/contact.png" /></span>
+		        <span class="mui-tab-label">市场资讯</span>
+		    </a>
+		    <a class="mui-tab-item" href="">
+		        <span class="mui-icon "><img src="../images/tb/sxt.png" /></span>
+		        <span class="mui-tab-label">安装摄像头</span>
+		    </a>
+		    <a class="mui-tab-item" href="map/map.html">
+		        <span class="mui-icon "><img src="../images/tb/map.png" /></span>
+		        <span class="mui-tab-label">媒体地图</span>
+		    </a>
+		    <a class="mui-tab-item" href="my/my.html">
+		        <span class="mui-icon "><img src="../images/tb/my.png" /></span>
+		        <span class="mui-tab-label">我的</span>
+		    </a>
+		</nav>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.plusReady(function(){
+   				 plus.nativeUI.showWaiting("数据正在加载中...",{
+   				 	loading:{
+   				 		icon:"../images/logo.ico",
+   				 		display:"block",
+   				 		height:"60px"
+   				 	}
+   				 });//显示原生等待框 
+			});  
+			var subpages = ["head/head.html", "more_imformation/more_imformation.html", "map/map.html", "my/my.html"];
+			var subpage_style = {
+				top: '37px',
+				bottom: '51px',
+				scrollIndicator: "none" 
+			};
+			var aniShow = {};
+			 //创建子页面，首个选项卡页面显示，其它均隐藏；
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				for (var i = 0; i < 4; i++) {
+					var temp = {};
+					var sub = plus.webview.create(subpages[i], subpages[i], subpage_style);
+					if (i > 0) {
+						sub.hide();
+						
+						
+					}else{
+						temp[subpages[i]] = "true";
+						mui.extend(aniShow,temp);
+						
+					}
+					self.append(sub);
+				}
+			});
+			var activeTab = subpages[0];
+			 //选项卡点击事件
+			mui('.mui-bar-tab').on('tap', 'a', function(e) {
+				var targetTab = this.getAttribute('href');
+				if (targetTab == activeTab) {
+					return;
+				}
+				if(!targetTab){
+					mui.openWindow({
+						url: "my/apply_video.html",
+						waiting: {
+							autoShow: false
+						}		
+					});
+				}else{
+					//显示目标选项卡
+				plus.webview.show(targetTab);
+				//隐藏当前;
+				plus.webview.hide(activeTab);
+				//更改当前活跃的选项卡
+				activeTab = targetTab;
+				}
+				
+			});
+			/**
+			 * Android返回键处理（IOS只能通过home键来杀掉程序）
+			 * 返回逻辑：一秒内连续点击两次，退出程序；
+			 * 这个官方已经写的很明白了，这里需要加上这一段代码，防止返回到入口页面；
+			 * http://www.html5plus.org/doc/zh_cn/runtime.html#plus.runtime.quit
+			 */
+			var first = null;
+			mui.back = function() {
+				if (!first) {
+					first = new Date().getTime();
+					plus.nativeUI.toast("再按一次退出应用");
+					setTimeout(function() {
+						first = null;
+					}, 1000);
+				} else {
+					if (new Date().getTime() - first < 1000) {
+						plus.runtime.quit();
+					}
+				}
+			}
+			//打开搜索界面
+			document.getElementById("ss").addEventListener("tap",function(){
+				mui.openWindow({
+					url: "my/find_media_list.html",
+					waiting: {
+						autoShow: false
+					},
+				})
+			});
+		</script>
+	</body>
+</html>
